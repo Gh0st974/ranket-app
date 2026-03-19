@@ -1,173 +1,175 @@
 // 📄 Fichier : /js/statsUI.js
 // 🎯 Rôle : Affichage DOM de l'onglet Statistiques
-
-import { getPlayers } from './storage.js';
-import { getPlayerStats, getHeadToHead } from './stats.js';
-import { drawEloChart } from './charts.js';
-
-let selectedA = null;
-let selectedB = null;
+// ⚠️ Pas d'import/export — fonctions exposées globalement
 
 /**
- * Initialise l'onglet Stats
+ * Point d'entrée appelé par app.js quand l'onglet Stats est ouvert
  */
-export function initStats() {
-  populateSelectors();
-  bindEvents();
-  renderStats();
+function initStats() {
+  _populateSelectors();
+  _bindSelectors();
+  _renderStats();
 }
 
-function populateSelectors() {
-  const players = getPlayers().sort((a, b) => a.name.localeCompare(b.name));
-  const selA = document.getElementById('stats-player-a');
-  const selB = document.getElementById('stats-player-b');
+/** Remplit les <select> avec la liste des joueurs */
+function _populateSelectors() {
+  const players = Storage.getPlayers();
+  const selectA = document.getElementById('stats-player-a');
+  const selectB = document.getElementById('stats-player-b');
+  if (!selectA || !selectB) return;
 
-  const emptyB = '<option value="">— Aucun (solo) —</option>';
-  const options = players.map(p =>
-    `<option value="${p.id}">${p.name}</option>`
+  const sorted = [...players].sort((a, b) => (b.elo || 1000) - (a.elo || 1000));
+
+  // Option vide pour B
+  const emptyOption = '<option value="">-- Aucun --</option>';
+
+  selectA.innerHTML = sorted.map(p =>
+    `<option value="${p.id}">${p.name} (${p.elo || 1000})</option>`
   ).join('');
 
-  selA.innerHTML = `<option value="">Choisir un joueur...</option>${options}`;
-  selB.innerHTML = `${emptyB}${options}`;
+  selectB.innerHTML = emptyOption + sorted.map(p =>
+    `<option value="${p.id}">${p.name} (${p.elo || 1000})</option>`
+  ).join('');
 }
 
-function bindEvents() {
-  document.getElementById('stats-player-a').addEventListener('change', (e) => {
-    selectedA = e.target.value || null;
-    renderStats();
-  });
+/** Écoute les changements de sélection */
+function _bindSelectors() {
+  const selectA = document.getElementById('stats-player-a');
+  const selectB = document.getElementById('stats-player-b');
+  if (!selectA || !selectB) return;
 
-  document.getElementById('stats-player-b').addEventListener('change', (e) => {
-    selectedB = e.target.value || null;
-    renderStats();
-  });
+  selectA.addEventListener('change', _renderStats);
+  selectB.addEventListener('change', _renderStats);
 }
 
-function renderStats() {
+/** Décide quoi afficher selon la sélection */
+function _renderStats() {
+  const selectA = document.getElementById('stats-player-a');
+  const selectB = document.getElementById('stats-player-b');
   const container = document.getElementById('stats-content');
+  if (!selectA || !container) return;
 
-  if (!selectedA) {
-    container.innerHTML = `<p class="stats-placeholder">Sélectionne un joueur pour voir ses statistiques.</p>`;
+  const idA = selectA.value;
+  const idB = selectB ? selectB.value : '';
+
+  if (!idA) {
+    container.innerHTML = '<p class="stats-placeholder">Sélectionne un joueur pour voir ses statistiques.</p>';
     return;
   }
 
-  const statsA = getPlayerStats(selectedA);
-  const statsB = selectedB ? getPlayerStats(selectedB) : null;
-  const h2h = selectedB ? getHeadToHead(selectedA, selectedB) : null;
+  const statsA = getPlayerStats(idA);
+  if (!statsA) return;
 
-  container.innerHTML = `
-    ${renderGraph()}
-    ${renderPlayerCards(statsA, statsB)}
-    ${h2h ? renderH2H(h2h) : ''}
-  `;
+  let html = _buildPlayerCard(statsA, 'a');
 
-  // Dessiner le graphique après injection HTML
-  const canvas = document.getElementById('elo-chart');
-  if (canvas && statsA.eloHistory.length > 1) {
-    drawEloChart(canvas, statsA.eloHistory, statsB?.eloHistory || null);
-  }
-}
-
-function renderGraph() {
-  return `
-    <section class="stats-section">
-      <h2 class="stats-section-title">📈 Évolution ELO</h2>
+  // Graphique ELO
+  html += `
+    <div class="chart-section">
+      <h3 class="section-title">Évolution ELO</h3>
       <div class="chart-wrapper">
         <canvas id="elo-chart"></canvas>
       </div>
-    </section>
+    </div>
   `;
+
+  // Head-to-head si joueur B sélectionné
+  if (idB && idB !== idA) {
+    const statsB = getPlayerStats(idB);
+    html += _buildPlayerCard(statsB, 'b');
+    html += _buildH2H(idA, idB);
+  }
+
+  container.innerHTML = html;
+
+  // Dessiner le graphique après injection du DOM
+  const histA = getEloHistory(idA);
+  const histB = idB && idB !== idA ? getEloHistory(idB) : null;
+  drawEloChart('elo-chart', histA, histB);
 }
 
-function renderPlayerCards(statsA, statsB) {
+/** Génère le HTML d'une carte joueur */
+function _buildPlayerCard(stats, side) {
+  const label = side === 'a' ? 'player-a' : 'player-b';
+  const colorClass = side === 'a' ? 'color-a' : 'color-b';
+
   return `
-    <section class="stats-section">
-      <h2 class="stats-section-title">🎯 Statistiques générales</h2>
+    <div class="stats-player-card ${label}">
+      <div class="player-card-header ${colorClass}">
+        <span class="player-card-name">${stats.player.name}</span>
+        <span class="player-card-elo">${stats.elo} ELO</span>
+      </div>
       <div class="stats-cards-row">
-        ${renderCard(statsA)}
-        ${statsB ? renderCard(statsB) : ''}
+        <div class="stat-card">
+          <span class="stat-value">${stats.wins}</span>
+          <span class="stat-label">Victoires</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">${stats.losses}</span>
+          <span class="stat-label">Défaites</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">${stats.winrate}%</span>
+          <span class="stat-label">Winrate</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">${stats.currentStreak}</span>
+          <span class="stat-label">Série actuelle</span>
+        </div>
       </div>
-    </section>
-  `;
-}
-
-function renderCard(stats) {
-  const { player, wins, losses, winRate, bestStreak, currentStreak, maxElo, currentElo, favoriteFormat, lastMatch } = stats;
-  const lastDate = lastMatch
-    ? new Date(lastMatch.date).toLocaleDateString('fr-FR')
-    : 'Aucun';
-
-  const rateClass = winRate >= 60 ? 'green' : winRate >= 25 ? 'yellow' : 'red';
-
-  return `
-    <div class="stat-card">
-      <div class="stat-card-header">
-        <span class="stat-card-name">${player.name}</span>
-        <span class="stat-card-elo">${currentElo} ELO</span>
-      </div>
-      <div class="stat-rows">
-        <div class="stat-row"><span>Victoires / Défaites</span><strong>${wins}V / ${losses}D</strong></div>
-        <div class="stat-row"><span>Ratio</span><strong class="ratio-${rateClass}">${winRate}%</strong></div>
-        <div class="stat-row"><span>ELO max atteint</span><strong>${maxElo}</strong></div>
-        <div class="stat-row"><span>Meilleure série</span><strong>🔥 ${bestStreak} victoires</strong></div>
-        <div class="stat-row"><span>Série en cours</span><strong>${currentStreak > 0 ? `🔥 ${currentStreak}` : '—'}</strong></div>
-        ${favoriteFormat ? `<div class="stat-row"><span>Format favori</span><strong>${favoriteFormat.name} (${Math.round(favoriteFormat.wins/favoriteFormat.total*100)}%)</strong></div>` : ''}
-        <div class="stat-row"><span>Dernier match</span><strong>${lastDate}</strong></div>
+      <div class="format-stats">
+        ${_buildFormatRow('Bo1', stats.bo1)}
+        ${_buildFormatRow('Bo3', stats.bo3)}
+        ${_buildFormatRow('Bo5', stats.bo5)}
       </div>
     </div>
   `;
 }
 
-function renderH2H(h2h) {
-  const { playerA, playerB, winsA, winsB, total, eloExchanged, matches } = h2h;
-  if (total === 0) {
-    return `
-      <section class="stats-section">
-        <h2 class="stats-section-title">⚔️ Head-to-Head</h2>
-        <p class="stats-placeholder">Ces deux joueurs ne se sont jamais affrontés.</p>
-      </section>
-    `;
-  }
+/** Génère une ligne de stat par format */
+function _buildFormatRow(label, data) {
+  if (data.total === 0) return '';
+  const pct = Math.round((data.wins / data.total) * 100);
+  return `
+    <div class="format-row">
+      <span class="format-label">${label}</span>
+      <span class="format-record">${data.wins}V / ${data.total - data.wins}D</span>
+      <div class="format-bar-bg">
+        <div class="format-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <span class="format-pct">${pct}%</span>
+    </div>
+  `;
+}
 
-  const pctA = Math.round((winsA / total) * 100);
-  const pctB = 100 - pctA;
-  const players = getPlayers();
+/** Génère le bloc Head-to-Head */
+function _buildH2H(idA, idB) {
+  const h2h = getHeadToHead(idA, idB);
+  if (!h2h.playerA || !h2h.playerB) return '';
+
+  const matchesHTML = h2h.matches.slice(0, 10).map(m => {
+    const winnerIsA = m.winnerId === idA;
+    const date = new Date(m.date).toLocaleDateString('fr-FR');
+    const delta = m.eloDelta || '?';
+    return `
+      <div class="h2h-match-row ${winnerIsA ? 'win-a' : 'win-b'}">
+        <span class="h2h-match-winner">${winnerIsA ? h2h.playerA.name : h2h.playerB.name} gagne</span>
+        <span class="h2h-match-date">${date}</span>
+        <span class="h2h-match-delta">±${delta} ELO</span>
+      </div>
+    `;
+  }).join('');
 
   return `
-    <section class="stats-section">
-      <h2 class="stats-section-title">⚔️ Head-to-Head</h2>
+    <div class="h2h-section">
+      <h3 class="section-title">Face à Face</h3>
       <div class="h2h-score">
-        <div class="h2h-player ${winsA > winsB ? 'winner' : ''}">
-          <span class="h2h-name">${playerA.name}</span>
-          <span class="h2h-wins">${winsA}</span>
-        </div>
-        <div class="h2h-vs">VS</div>
-        <div class="h2h-player ${winsB > winsA ? 'winner' : ''} right">
-          <span class="h2h-name">${playerB.name}</span>
-          <span class="h2h-wins">${winsB}</span>
-        </div>
+        <span class="h2h-name color-a">${h2h.playerA.name}</span>
+        <span class="h2h-wins">${h2h.winsA} — ${h2h.winsB}</span>
+        <span class="h2h-name color-b">${h2h.playerB.name}</span>
       </div>
-      <div class="h2h-bar">
-        <div class="h2h-bar-a" style="width:${pctA}%"></div>
-        <div class="h2h-bar-b" style="width:${pctB}%"></div>
+      <div class="h2h-matches">
+        ${matchesHTML || '<p class="stats-placeholder">Aucun match joué entre ces deux joueurs.</p>'}
       </div>
-      <p class="h2h-meta">${total} match(s) joué(s) — ${eloExchanged} pts ELO échangés au total</p>
-
-      <div class="h2h-history">
-        ${matches.map(m => {
-          const winner = players.find(p => p.id === m.winnerId);
-          const date = new Date(m.date).toLocaleDateString('fr-FR');
-          const isAWinner = m.winnerId === playerA.id;
-          return `
-            <div class="h2h-match-row ${isAWinner ? 'win-a' : 'win-b'}">
-              <span class="h2h-match-date">${date}</span>
-              <span class="h2h-match-winner">🏆 ${winner?.name || '?'}</span>
-              <span class="h2h-match-format">${m.format?.toUpperCase() || ''}</span>
-              <span class="h2h-match-delta">±${Math.abs(m.eloDelta || 0)} ELO</span>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    </section>
+    </div>
   `;
 }
