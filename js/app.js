@@ -49,8 +49,7 @@ const App = {
   _showStatsTab() {
     document.getElementById('app-main').classList.add('hidden');
     document.getElementById('tab-stats').classList.remove('hidden');
-    // initStats() est exposé par statsUI.js (global)
-    if (typeof initStats === 'function') initStats();
+    if (typeof ViewStats !== 'undefined') ViewStats.render();
   },
 
   /** Masque la section Stats et réaffiche le main */
