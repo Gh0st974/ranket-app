@@ -28,3 +28,12 @@
     font-size: 0.65rem;
   }
 }
+
+/* ===== STATS RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .stats-selectors { flex-direction: column; }
+  .stats-cards-row { flex-direction: column; }
+  .chart-wrapper { height: 200px; }
+  .h2h-wins { font-size: 1.8rem; }
+  .h2h-match-row { flex-wrap: wrap; gap: 0.3rem; }
+}

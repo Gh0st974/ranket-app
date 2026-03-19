@@ -576,3 +576,193 @@
   accent-color: #e63946;
   cursor: pointer;
 }
+
+/* ===== ONGLET STATS ===== */
+.stats-header {
+  padding: 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-selectors {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.selector-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.selector-group label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.selector-group select {
+  padding: 0.6rem 0.8rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.stats-placeholder {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 3rem 1rem;
+  font-size: 1rem;
+}
+
+.stats-section {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+/* Graphique */
+.chart-wrapper {
+  width: 100%;
+  height: 260px;
+  position: relative;
+}
+
+.chart-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-tooltip {
+  position: fixed;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+  pointer-events: none;
+  display: none;
+  z-index: 9999;
+  line-height: 1.6;
+}
+
+.chart-tooltip .tt-elo { font-weight: 700; font-size: 1rem; }
+.chart-tooltip .tt-delta.won { color: #4caf50; }
+.chart-tooltip .tt-delta.lost { color: #e63946; }
+.chart-tooltip .tt-opp { color: #aaa; }
+.chart-tooltip .tt-date { color: #666; font-size: 0.75rem; }
+
+/* Cartes stats */
+.stats-cards-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 260px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-card-name { font-weight: 700; font-size: 1.05rem; }
+.stat-card-elo { color: var(--accent); font-weight: 700; }
+
+.stat-rows { padding: 0.5rem 0; }
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-row:last-child { border-bottom: none; }
+.stat-row span { color: var(--text-muted); }
+
+.ratio-green { color: #4caf50; }
+.ratio-yellow { color: #f0a500; }
+.ratio-red { color: #e63946; }
+
+/* Head to Head */
+.h2h-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.h2h-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.h2h-player.right { align-items: center; }
+.h2h-name { font-size: 0.9rem; color: var(--text-muted); }
+.h2h-wins { font-size: 2.5rem; font-weight: 900; }
+.h2h-player.winner .h2h-wins { color: var(--accent); }
+.h2h-vs { font-size: 1rem; color: var(--text-muted); font-weight: 700; }
+
+.h2h-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.h2h-bar-a { background: #e63946; }
+.h2h-bar-b { background: #457b9d; }
+
+.h2h-meta {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.h2h-history { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.h2h-match-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--surface);
+  border-left: 3px solid transparent;
+}
+
+.h2h-match-row.win-a { border-left-color: #e63946; }
+.h2h-match-row.win-b { border-left-color: #457b9d; }
+.h2h-match-date { color: var(--text-muted); font-size: 0.78rem; }
+.h2h-match-delta { color: var(--text-muted); }
