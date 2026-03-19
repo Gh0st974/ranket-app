@@ -1,0 +1,30 @@
+/* 📄 Fichier : /css/responsive.css
+   🎯 Rôle : Adaptations pour tablettes et desktops */
+
+/* Tablette */
+@media (min-width: 600px) {
+  .app-main {
+    padding: 20px 24px;
+  }
+
+  .add-player-form input {
+    min-width: 120px;
+  }
+
+  .format-selector {
+    max-width: 420px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 960px) {
+  body {
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0,0,0,0.12);
+  }
+
+  .app-nav .nav-label {
+    font-size: 0.65rem;
+  }
+}

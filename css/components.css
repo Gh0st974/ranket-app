@@ -1,0 +1,578 @@
+/* 📄 Fichier : /css/components.css
+   🎯 Rôle : Styles des composants réutilisables (boutons, badges, cartes, tableau...) */
+
+/* ===== BOUTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn:active { transform: scale(0.97); }
+.btn:hover  { opacity: 0.88; }
+
+.btn-primary   { background: #e63946; color: white; }
+.btn-secondary { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
+.btn-danger    { background: #ff4d4d; color: white; }
+.btn-success   { background: #2dc653; color: white; }
+.btn-warning   { background: #f4a100; color: white; }
+.btn-outline   { background: transparent; border: 2px solid #e63946; color: #e63946; }
+.btn-full      { width: 100%; justify-content: center; padding: 12px; border-radius: 10px; font-size: 1rem; }
+
+/* ===== TABLEAU CLASSEMENT ===== */
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.ranking-table th {
+  background: #e63946;
+  color: white;
+  padding: 8px 6px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.ranking-table td {
+  padding: 10px 6px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.ranking-table tr:hover td {
+  background-color: #fff5f5;
+}
+
+/* Rang */
+.rank-cell { font-weight: 700; width: 32px; text-align: center; }
+
+/* Médailles */
+.medal-gold   { font-size: 1.1rem; }
+.medal-silver { font-size: 1.1rem; }
+.medal-bronze { font-size: 1.1rem; }
+
+/* Nom joueur */
+.player-name-cell {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Flamme série */
+.streak-icon { color: #ff6b00; font-size: 0.9rem; }
+
+/* ELO */
+.elo-cell { font-weight: 700; color: #333; }
+
+/* Ratio badge */
+.ratio-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: white;
+}
+.ratio-red    { background: #e63946; }
+.ratio-yellow { background: #f4a100; }
+.ratio-green  { background: #2dc653; }
+
+/* Victoires / Défaites */
+.wins-cell   { color: #2dc653; font-weight: 700; }
+.losses-cell { color: #e63946; font-weight: 700; }
+
+/* ===== CARTES MATCH HISTORIQUE ===== */
+.match-card {
+  background: white;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.match-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.match-date {
+  font-size: 0.72rem;
+  color: #888;
+}
+
+.match-format-badge {
+  background: #f0f0f0;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.match-players {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.match-player {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.match-player-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.match-player-name.winner { color: #e63946; }
+
+.match-score-badge {
+  background: #e63946;
+  color: white;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.match-elo-delta {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.elo-gain { color: #2dc653; }
+.elo-loss { color: #e63946; }
+
+.match-sets {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.set-badge {
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  color: #444;
+}
+
+.match-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+.icon-btn-edit   { background: #fff3cd; color: #856404; }
+.icon-btn-delete { background: #ffd6d6; color: #c0392b; }
+
+/* ===== FORMULAIRE MATCH ===== */
+.format-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.format-btn {
+  flex: 1;
+  padding: 10px 6px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #555;
+  background: white;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.format-btn.active {
+  border-color: #e63946;
+  color: #e63946;
+  background: #fff0f1;
+}
+
+.vs-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.player-select-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.player-select-block label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.player-select-block select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: white;
+}
+
+.vs-label {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #e63946;
+}
+
+.elo-proba-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.proba-highlight { color: #e63946; font-weight: 700; }
+
+/* Sets */
+.sets-section { margin-bottom: 16px; }
+.sets-section h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 10px; }
+
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.set-row label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.set-input {
+  width: 52px;
+  padding: 7px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.set-separator {
+  font-weight: 700;
+  color: #aaa;
+}
+
+.set-delete-btn {
+  width: 26px;
+  height: 26px;
+  background: #ffd6d6;
+  color: #c0392b;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+/* Score final */
+.final-score-block {
+  background: #fff0f1;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.final-score-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e63946;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.final-score-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.final-score-number {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #e63946;
+}
+
+/* ===== JOUEURS ===== */
+.player-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.player-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-list-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.player-list-stats {
+  font-size: 0.72rem;
+  color: #888;
+}
+
+.player-list-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Formulaire ajout joueur */
+.add-player-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.add-player-form input {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+/* Zone danger */
+.danger-zone {
+  background: #fff5f5;
+  border: 1px solid #ffc5c5;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 20px;
+}
+
+.danger-zone-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #c0392b;
+  margin-bottom: 4px;
+}
+
+.danger-zone-subtitle {
+  font-size: 0.72rem;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.danger-zone-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ===== TOOLBAR (Sélectionner / Tout effacer) ===== */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  justify-content: flex-end;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1a1a1a;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 2000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== SECTION LABEL ===== */
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+/* ===== SHOW MORE BUTTON ===== */
+.show-more-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.show-more-btn button {
+  color: #e63946;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  color: #bbb;
+  padding: 40px 20px;
+  font-size: 0.9rem;
+}
+
+/* ===== CSV IMPORT ===== */
+.csv-import-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.csv-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #f4a100;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.csv-file-name {
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+}
+
+#csv-file-input { display: none; }
+
+/* ===== FILTRE HISTORIQUE ===== */
+.history-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.history-filters select {
+  flex: 1;
+  min-width: 120px;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  background: white;
+}
+
+.filter-active-btn {
+  background: #e63946 !important;
+  color: white !important;
+}
+
+/* Checkbox sélection */
+.select-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #e63946;
+  cursor: pointer;
+}
