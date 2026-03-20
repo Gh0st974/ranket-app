@@ -12,7 +12,7 @@ function getPlayerStats(playerId) {
   if (!player) return null;
 
   const playerMatches = matches.filter(
-    m => m.player1Id === playerId || m.player2Id === playerId
+    m => m.playerAId === playerId || m.playerBId === playerId
   );
 
   let wins = 0, losses = 0;
@@ -21,15 +21,15 @@ function getPlayerStats(playerId) {
   let bo3Wins = 0, bo3Total = 0;
   let bo5Wins = 0, bo5Total = 0;
 
-  const sorted = [...playerMatches].sort((a, b) => a.date - b.date);
+  const sorted = [...playerMatches].sort((a, b) => a.timestamp - b.timestamp);
 
   sorted.forEach(m => {
     const isWinner = m.winnerId === playerId;
-    const format = m.format || 'bo1';
+    const format = m.format || 'best1';
 
-    if (format === 'bo1') { bo1Total++; if (isWinner) bo1Wins++; }
-    if (format === 'bo3') { bo3Total++; if (isWinner) bo3Wins++; }
-    if (format === 'bo5') { bo5Total++; if (isWinner) bo5Wins++; }
+    if (format === 'best1') { bo1Total++; if (isWinner) bo1Wins++; }
+    if (format === 'best3') { bo3Total++; if (isWinner) bo3Wins++; }
+    if (format === 'best5') { bo5Total++; if (isWinner) bo5Wins++; }
 
     if (isWinner) {
       wins++;
@@ -74,9 +74,9 @@ function getHeadToHead(playerAId, playerBId) {
   const players = Storage.getPlayers();
 
   const h2hMatches = matches.filter(m =>
-    (m.player1Id === playerAId && m.player2Id === playerBId) ||
-    (m.player1Id === playerBId && m.player2Id === playerAId)
-  ).sort((a, b) => b.date - a.date);
+    (m.playerAId === playerAId && m.playerBId === playerBId) ||
+    (m.playerAId === playerBId && m.playerBId === playerAId)
+  ).sort((a, b) => b.timestamp - a.timestamp);
 
   let winsA = 0, winsB = 0;
 
@@ -104,20 +104,20 @@ function getEloHistory(playerId) {
   if (!player) return [];
 
   const sorted = matches
-    .filter(m => m.player1Id === playerId || m.player2Id === playerId)
-    .sort((a, b) => a.date - b.date);
+    .filter(m => m.playerAId === playerId || m.playerBId === playerId)
+    .sort((a, b) => a.timestamp - b.timestamp);
 
   let elo = 1000;
   const history = [{ date: null, elo, label: 'Départ' }];
 
   sorted.forEach(m => {
     const isWinner = m.winnerId === playerId;
-    const delta = m.eloDelta || 20;
+    const delta = Math.abs(m.deltaA || 20);
     elo += isWinner ? delta : -delta;
     history.push({
-      date: m.date,
+      date: m.timestamp,
       elo,
-      label: new Date(m.date).toLocaleDateString('fr-FR')
+      label: new Date(m.timestamp).toLocaleDateString('fr-FR')
     });
   });
 
