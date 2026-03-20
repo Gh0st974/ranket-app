@@ -107,14 +107,13 @@ const ViewStats = (() => {
     const historyB = (idB && idB !== idA) ? getEloHistory(idB) : null;
     drawEloChart('elo-chart', historyA, historyB);
 
-    // Radar uniquement en mode solo
-    if (!idB || idB === idA) {
-      _renderRadarChart(idA);
+    // Radar — solo ou comparaison
+    _renderRadarChart(idA, idB);
     }
   }
 
   // ─── Radar — HTML ──────────────────────────────────────────────
-  function _buildRadarSection(playerId) {
+  function _buildRadarSection(playerIdA, playerIdB = null) {
     return `
       <div class="radar-section">
         <h3 class="section-title">📊 Profil du joueur</h3>
@@ -126,52 +125,81 @@ const ViewStats = (() => {
   }
 
   // ─── Radar — Dessin Chart.js ───────────────────────────────────
-  function _renderRadarChart(playerId) {
-    const canvas = document.getElementById('radar-chart');
-    if (!canvas) return;
+function _renderRadarChart(playerIdA, playerIdB = null) {
+  const canvas = document.getElementById('radar-chart');
+  if (!canvas) return;
 
-    // Détruire l'instance précédente si elle existe
-    if (window._radarChartInstance) {
-      window._radarChartInstance.destroy();
-    }
+  // Détruire l'instance précédente si elle existe
+  if (window._radarChartInstance) {
+    window._radarChartInstance.destroy();
+  }
 
-    const data = getRadarStats(playerId);
+  const dataA = getRadarStats(playerIdA);
+  const playerA = Players.getById(playerIdA);
+  const labelA = playerA ? Players.fullName(playerA) : 'Joueur A';
 
-    window._radarChartInstance = new Chart(canvas, {
-      type: 'radar',
-      data: {
-        labels: data.labels,
-        datasets: [{
-          label: 'Profil',
-          data: [data.niveau, data.regularite, data.forme, data.combativite, data.experience],
-          backgroundColor: 'rgba(99, 102, 241, 0.2)',
-          borderColor: 'rgba(99, 102, 241, 1)',
-          borderWidth: 2,
-          pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-          pointRadius: 4
-        }]
-      },
-      options: {
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 100,
-            ticks: { display: false },
-            grid: { color: 'rgba(255,255,255,0.1)' },
-            angleLines: { color: 'rgba(255,255,255,0.15)' },
-            pointLabels: {
-              color: '#f1f5f9',
-              font: { size: 13, weight: 'bold' }
-            }
-          }
-        },
+  // ── Dataset joueur A ──
+  const datasets = [{
+    label: labelA,
+    data: [dataA.niveau, dataA.regularite, dataA.forme, dataA.combativite, dataA.experience],
+    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+    borderColor: 'rgba(99, 102, 241, 1)',
+    borderWidth: 2,
+    pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+    pointRadius: 4
+  }];
 
-        plugins: {
-          legend: { display: false }
-        }
-      }
+  // ── Dataset joueur B (si comparaison) ──
+  if (playerIdB && playerIdB !== playerIdA) {
+    const dataB = getRadarStats(playerIdB);
+    const playerB = Players.getById(playerIdB);
+    const labelB = playerB ? Players.fullName(playerB) : 'Joueur B';
+
+    datasets.push({
+      label: labelB,
+      data: [dataB.niveau, dataB.regularite, dataB.forme, dataB.combativite, dataB.experience],
+      backgroundColor: 'rgba(249, 115, 22, 0.2)',
+      borderColor: 'rgba(249, 115, 22, 1)',
+      borderWidth: 2,
+      pointBackgroundColor: 'rgba(249, 115, 22, 1)',
+      pointRadius: 4
     });
   }
+
+  window._radarChartInstance = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: dataA.labels,
+      datasets
+    },
+    options: {
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { display: false },
+          grid: { color: 'rgba(255,255,255,0.1)' },
+          angleLines: { color: 'rgba(255,255,255,0.15)' },
+          pointLabels: {
+            color: '#f1f5f9',
+            font: { size: 13, weight: 'bold' }
+          }
+        }
+      },
+      plugins: {
+        // Afficher la légende uniquement en mode comparaison
+        legend: {
+          display: playerIdB !== null,
+          labels: {
+            color: '#f1f5f9',
+            font: { size: 12 }
+          }
+        }
+      }
+    }
+  });
+}
+
 
   // ─── Rivalités — HTML ──────────────────────────────────────────
   function _buildRivalriesSection(playerId) {
