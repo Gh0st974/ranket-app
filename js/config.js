@@ -14,24 +14,14 @@ const CONFIG = {
     { maxElo: Infinity, k: 20 }
   ],
 
-  // Multiplicateurs de combativité selon le score en sets
-  // Clé : "setsGagnant-setsPerdant"
-  ELO_SET_MULTIPLIERS: {
-    // Vainqueur
-    '3-0': 1.0,
-    '3-1': 1.2,
-    '3-2': 1.4,
-    '2-0': 1.0,
-    '2-1': 1.2,
-    '1-0': 1.0,
-    // Perdant (clé du point de vue du perdant)
-    '0-3': 0.8,
-    '1-3': 1.1,
-    '2-3': 1.3,
-    '0-2': 0.8,
-    '1-2': 1.1,
-    '0-1': 0.8
-  },
+  // Multiplicateur de combativité selon l'écart moyen de points par set
+  // Plus l'écart est faible, plus le match était serré = bonus ELO
+  ELO_COMBATIVITY_BRACKETS: [
+    { maxGap: 3,        multiplierWinner: 1.4, multiplierLoser: 1.3 },
+    { maxGap: 6,        multiplierWinner: 1.2, multiplierLoser: 1.1 },
+    { maxGap: 9,        multiplierWinner: 1.0, multiplierLoser: 1.0 },
+    { maxGap: Infinity, multiplierWinner: 0.8, multiplierLoser: 0.8 }
+  ],
 
   // --- SÉRIES ---
   STREAK_MIN: 3,

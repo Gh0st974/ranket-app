@@ -1,19 +1,18 @@
 // 📄 Fichier : /js/elo.js
 // 🎯 Rôle : Calculs mathématiques du système ELO avec K-factor variable
-//           et multiplicateur de combativité basé sur le score en sets
+//           et multiplicateur de combativité basé sur l'écart moyen de points par set
 
 const Elo = {
 
   /**
    * Calcule les deltas ELO après un match
-   * @param {number}  eloA   - ELO du joueur A avant le match
-   * @param {number}  eloB   - ELO du joueur B avant le match
-   * @param {boolean} aWins  - true si A a gagné
-   * @param {number}  setsA  - Sets remportés par A
-   * @param {number}  setsB  - Sets remportés par B
+   * @param {number}  eloA  - ELO du joueur A avant le match
+   * @param {number}  eloB  - ELO du joueur B avant le match
+   * @param {boolean} aWins - true si A a gagné
+   * @param {Array}   sets  - [{ a: number, b: number }, ...]
    * @returns {{ deltaA: number, deltaB: number }}
    */
-  calculate(eloA, eloB, aWins, setsA = 0, setsB = 0) {
+  calculate(eloA, eloB, aWins, sets = []) {
     const expectedA = this._expected(eloA, eloB);
     const expectedB = this._expected(eloB, eloA);
 
@@ -23,18 +22,15 @@ const Elo = {
     const kA = this._kFactor(eloA);
     const kB = this._kFactor(eloB);
 
-    // Multiplicateur selon le score vu du gagnant et du perdant
-    const multWinner = this._multiplier(
-      aWins ? setsA : setsB,
-      aWins ? setsB : setsA,
-      true
-    );
-    const multLoser = this._multiplier(
-      aWins ? setsA : setsB,
-      aWins ? setsB : setsA,
-      false
-    );
+    // Calcul de l'écart moyen de points par set
+    const avgGap = this._averageGap(sets);
 
+    // Récupération des multiplicateurs selon l'écart moyen
+    const bracket = CONFIG.ELO_COMBATIVITY_BRACKETS.find(b => avgGap <= b.maxGap);
+    const multWinner = bracket ? bracket.multiplierWinner : 1.0;
+    const multLoser  = bracket ? bracket.multiplierLoser  : 1.0;
+
+    // On applique le bon multiplicateur à chaque joueur
     const multA = aWins ? multWinner : multLoser;
     const multB = aWins ? multLoser  : multWinner;
 
@@ -63,26 +59,20 @@ const Elo = {
   },
 
   /**
-   * Retourne le multiplicateur de combativité selon le score en sets
-   * @param {number}  setsWinner - Sets du gagnant
-   * @param {number}  setsLoser  - Sets du perdant
-   * @param {boolean} isWinner   - true si on calcule pour le gagnant
+   * Calcule l'écart moyen de points par set
+   * Ex: sets = [{a:11, b:9}, {a:8, b:11}, {a:11, b:7}]
+   *     écarts = [2, 3, 4] → moyenne = 3
+   * @param {Array} sets - [{ a: number, b: number }, ...]
    * @returns {number}
    */
-  _multiplier(setsWinner, setsLoser, isWinner) {
-    const key = isWinner
-      ? `${setsWinner}-${setsLoser}`   // ex: "3-1" pour le gagnant
-      : `${setsLoser}-${setsWinner}`;  // ex: "1-3" pour le perdant
+  _averageGap(sets) {
+    if (!sets || sets.length === 0) return 0;
 
-    const mult = CONFIG.ELO_SET_MULTIPLIERS[key];
+    const totalGap = sets.reduce((sum, set) => {
+      return sum + Math.abs(set.a - set.b);
+    }, 0);
 
-    // Si la clé n'existe pas, multiplicateur neutre par défaut
-    if (mult === undefined) {
-      console.warn(`[ELO] Multiplicateur introuvable pour la clé "${key}", valeur 1.0 utilisée.`);
-      return 1.0;
-    }
-
-    return mult;
+    return totalGap / sets.length;
   },
 
   /**
