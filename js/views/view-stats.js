@@ -112,7 +112,7 @@ const ViewStats = (() => {
     // Radar — solo ou comparaison
     _renderRadarChart(idA, idB);
     }
-  }
+  
 
   // ─── Radar — HTML ──────────────────────────────────────────────
   function _buildRadarSection(playerIdA, playerIdB = null) {
