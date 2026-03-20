@@ -7,9 +7,9 @@ const ViewStats = (() => {
 
   // ─── Point d'entrée ───────────────────────────────────────────
   function render() {
-    _populateSelectors();
-    _bindSelectors();
-    _renderStats();
+  _bindSelectors();    // Clone d'abord
+  _populateSelectors(); // Puis remplit les nouveaux éléments
+  _renderStats();
   }
 
   // ─── Remplissage des <select> ──────────────────────────────────
