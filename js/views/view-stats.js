@@ -22,11 +22,11 @@ const ViewStats = (() => {
     const sorted = [...players].sort((a, b) => (b.elo || 1000) - (a.elo || 1000));
 
     selectA.innerHTML = sorted.map(p =>
-      `<option value="${p.id}">${p.name} (${p.elo || 1000})</option>`
+      `<option value="${p.id}">${Players.fullName(p)} (${p.elo || 1000})</option>`
     ).join('');
 
     selectB.innerHTML = '<option value="">-- Aucun --</option>' + sorted.map(p =>
-      `<option value="${p.id}">${p.name} (${p.elo || 1000})</option>`
+      `<option value="${p.id}">${Players.fullName(p)} (${p.elo || 1000})</option>`
     ).join('');
   }
 
@@ -96,7 +96,7 @@ const ViewStats = (() => {
     const colorClass = side === 'a' ? 'color-a' : 'color-b';
     return `
       <div class="player-stats-card ${colorClass}">
-        <h3 class="player-stats-name">${stats.player.name}</h3>
+        <h3 class="player-stats-name">${Players.fullName(stats.player)}</h3>
         <div class="stats-grid">
           <div class="stat-card">
             <span class="stat-value">${stats.elo}</span>
@@ -159,7 +159,7 @@ const ViewStats = (() => {
       const delta = m.eloDelta || '?';
       return `
         <div class="h2h-match-row ${winnerIsA ? 'win-a' : 'win-b'}">
-          <span class="h2h-match-winner">${winnerIsA ? h2h.playerA.name : h2h.playerB.name} gagne</span>
+          <span class="h2h-match-winner">${winnerIsA ? Players.fullName(h2h.playerA) : Players.fullName(h2h.playerB)} gagne</span>
           <span class="h2h-match-date">${date}</span>
           <span class="h2h-match-delta">±${delta} ELO</span>
         </div>
@@ -170,9 +170,9 @@ const ViewStats = (() => {
       <div class="h2h-section">
         <h3 class="section-title">Face à Face</h3>
         <div class="h2h-score">
-          <span class="h2h-name color-a">${h2h.playerA.name}</span>
+          <span class="h2h-name color-a">${Players.fullName(h2h.playerA)}</span>
           <span class="h2h-wins">${h2h.winsA} — ${h2h.winsB}</span>
-          <span class="h2h-name color-b">${h2h.playerB.name}</span>
+          <span class="h2h-name color-b">${Players.fullName(h2h.playerB)}</span>
         </div>
         <div class="h2h-matches">
           ${matchesHTML || '<p class="stats-placeholder">Aucun match entre ces deux joueurs.</p>'}
