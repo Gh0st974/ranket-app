@@ -1,5 +1,6 @@
 // 📄 Fichier : /js/elo.js
-// 🎯 Rôle : Calculs mathématiques du système ELO
+// 🎯 Rôle : Calculs mathématiques du système ELO avec K-factor variable
+//           et multiplicateur de combativité relatif à l'écart d'ELO attendu
 
 const Elo = {
 
@@ -8,20 +9,27 @@ const Elo = {
    * @param {number}  eloA  - ELO du joueur A avant le match
    * @param {number}  eloB  - ELO du joueur B avant le match
    * @param {boolean} aWins - true si A a gagné
+   * @param {Array}   sets  - [{ a: number, b: number }, ...]
    * @returns {{ deltaA: number, deltaB: number }}
    */
-  calculate(eloA, eloB, aWins) {
+  calculate(eloA, eloB, aWins, sets = []) {
     const expectedA = this._expected(eloA, eloB);
     const expectedB = this._expected(eloB, eloA);
 
     const scoreA = aWins ? 1 : 0;
     const scoreB = aWins ? 0 : 1;
 
-    const kA = CONFIG.ELO_K_FACTOR(eloA);
-    const kB = CONFIG.ELO_K_FACTOR(eloB);
+    const kA = this._kFactor(eloA);
+    const kB = this._kFactor(eloB);
 
-    const deltaA = Math.round(kA * (scoreA - expectedA));
-    const deltaB = Math.round(kB * (scoreB - expectedB));
+    // Calcul du multiplicateur de combativité relatif
+    const { multWinner, multLoser } = this._combativityMultiplier(eloA, eloB, aWins, sets);
+
+    const multA = aWins ? multWinner : multLoser;
+    const multB = aWins ? multLoser  : multWinner;
+
+    const deltaA = Math.round(kA * multA * (scoreA - expectedA));
+    const deltaB = Math.round(kB * multB * (scoreB - expectedB));
 
     return { deltaA, deltaB };
   },
@@ -32,6 +40,83 @@ const Elo = {
    */
   winProbability(eloA, eloB) {
     return Math.round(this._expected(eloA, eloB) * 100);
+  },
+
+  /**
+   * Retourne le K-factor selon les paliers définis dans config.js
+   * @param {number} elo
+   * @returns {number}
+   */
+  _kFactor(elo) {
+    const bracket = CONFIG.ELO_K_BRACKETS.find(b => elo < b.maxElo);
+    return bracket ? bracket.k : 20;
+  },
+
+  /**
+   * Calcule le multiplicateur de combativité en comparant
+   * l'écart réel de points par set à l'écart attendu selon la diff d'ELO.
+   *
+   * Logique :
+   *   performance = écart_attendu - écart_réel
+   *   → performance > 0 : le faible a résisté → récompense élevée
+   *   → performance < 0 : le fort a écrasé    → récompense faible
+   *
+   * @param {number}  eloA
+   * @param {number}  eloB
+   * @param {boolean} aWins
+   * @param {Array}   sets - [{ a: number, b: number }, ...]
+   * @returns {{ multWinner: number, multLoser: number }}
+   */
+  _combativityMultiplier(eloA, eloB, aWins, sets) {
+    // Valeur par défaut si pas de sets
+    if (!sets || sets.length === 0) return { multWinner: 1.0, multLoser: 1.0 };
+
+    const eloDiff    = Math.abs(eloA - eloB);
+    const expectedGap = this._expectedGap(eloDiff);
+    const avgGap      = this._averageGap(sets);
+
+    // performance positive = le faible a résisté
+    // performance négative = le fort a dominé
+    const performance = expectedGap - avgGap;
+
+    // On récupère le palier correspondant à la performance
+    const bracket = CONFIG.ELO_COMBATIVITY_BRACKETS.find(b => performance >= b.minPerf);
+    const multWinner = bracket ? bracket.multiplierWinner : 1.0;
+    const multLoser  = bracket ? bracket.multiplierLoser  : 1.0;
+
+    return { multWinner, multLoser };
+  },
+
+  /**
+   * Retourne l'écart de points attendu par set selon la différence d'ELO
+   * Plus la différence est grande, plus l'écart attendu est élevé
+   *
+   * Table :
+   *   0  - 50  → 2 pts
+   *   51 - 150 → 4 pts
+   *   151- 300 → 6 pts
+   *   301+     → 8 pts
+   *
+   * @param {number} eloDiff - différence absolue entre les deux ELO
+   * @returns {number}
+   */
+  _expectedGap(eloDiff) {
+    if (eloDiff <= 50)  return 2;
+    if (eloDiff <= 150) return 4;
+    if (eloDiff <= 300) return 6;
+    return 8;
+  },
+
+  /**
+   * Calcule l'écart moyen de points par set
+   * Ex: sets = [{a:11, b:9}, {a:8, b:11}] → écarts = [2, 3] → moyenne = 2.5
+   * @param {Array} sets - [{ a: number, b: number }, ...]
+   * @returns {number}
+   */
+  _averageGap(sets) {
+    if (!sets || sets.length === 0) return 0;
+    const totalGap = sets.reduce((sum, set) => sum + Math.abs(set.a - set.b), 0);
+    return totalGap / sets.length;
   },
 
   /**
