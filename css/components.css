@@ -705,9 +705,9 @@
 .stat-row:last-child { border-bottom: none; }
 .stat-row span { color: var(--text-muted); }
 
-.ratio-green { color: #4caf50; }
-.ratio-yellow { color: #f0a500; }
-.ratio-red { color: #e63946; }
+.ratio-green { color: #377f39; }
+.ratio-yellow { color: #ad7600; }
+.ratio-red { color: #942730; }
 
 /* Head to Head */
 .h2h-score {
