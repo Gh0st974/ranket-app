@@ -45,26 +45,48 @@ const ViewStats = (() => {
   }
 
   // ─── Rendu principal ───────────────────────────────────────────
-  function _renderStats() {
-    const selectA = document.getElementById('stats-player-a');
-    const selectB = document.getElementById('stats-player-b');
-    const container = document.getElementById('stats-content');
-    if (!selectA || !container) return;
+function _renderStats() {
+  const selectA = document.getElementById('stats-player-a');
+  const selectB = document.getElementById('stats-player-b');
+  const container = document.getElementById('stats-content');
+  if (!selectA || !container) return;
 
-    const idA = selectA.value;
-    const idB = selectB ? selectB.value : '';
+  const idA = selectA.value;
+  const idB = selectB ? selectB.value : '';
 
-    if (!idA) {
-      container.innerHTML = '<p class="stats-placeholder">Sélectionne un joueur pour voir ses statistiques.</p>';
-      return;
+  if (!idA) {
+    container.innerHTML = '<p class="stats-placeholder">Sélectionne un joueur pour voir ses statistiques.</p>';
+    return;
+  }
+
+  const statsA = getPlayerStats(idA);
+  if (!statsA) return;
+
+  let html = '';
+
+  // ── Mode comparaison : côte à côte ──
+  if (idB && idB !== idA) {
+    const statsB = getPlayerStats(idB);
+    if (statsB) {
+      html += `
+        <div class="comparison-row">
+          ${_buildPlayerCard(statsA, 'a')}
+          ${_buildPlayerCard(statsB, 'b')}
+        </div>
+      `;
+      html += `
+        <div class="chart-section">
+          <h3 class="section-title">Évolution ELO</h3>
+          <div class="chart-wrapper">
+            <canvas id="elo-chart"></canvas>
+          </div>
+        </div>
+      `;
+      html += _buildH2H(idA, idB);
     }
-
-    const statsA = getPlayerStats(idA);
-    if (!statsA) return;
-
-    let html = _buildPlayerCard(statsA, 'a');
-
-    // Graphique ELO
+  } else {
+    // ── Mode solo ──
+    html += _buildPlayerCard(statsA, 'a');
     html += `
       <div class="chart-section">
         <h3 class="section-title">Évolution ELO</h3>
@@ -73,23 +95,15 @@ const ViewStats = (() => {
         </div>
       </div>
     `;
-
-    // Head-to-head si joueur B sélectionné
-    if (idB && idB !== idA) {
-      const statsB = getPlayerStats(idB);
-      if (statsB) {
-        html += _buildPlayerCard(statsB, 'b');
-        html += _buildH2H(idA, idB);
-      }
-    }
-
-    container.innerHTML = html;
-
-    // Dessin du graphique après injection HTML
-    const historyA = getEloHistory(idA);
-    const historyB = (idB && idB !== idA) ? getEloHistory(idB) : null;
-    drawEloChart('elo-chart', historyA, historyB);
   }
+
+  container.innerHTML = html;
+
+  const historyA = getEloHistory(idA);
+  const historyB = (idB && idB !== idA) ? getEloHistory(idB) : null;
+  drawEloChart('elo-chart', historyA, historyB);
+}
+
 
   // ─── Carte joueur ──────────────────────────────────────────────
   function _buildPlayerCard(stats, side) {

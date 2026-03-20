@@ -766,3 +766,18 @@
 .h2h-match-row.win-b { border-left-color: #457b9d; }
 .h2h-match-date { color: var(--text-muted); font-size: 0.78rem; }
 .h2h-match-delta { color: var(--text-muted); }
+
+/* ── Comparaison STATS côte à côte ── */
+.comparison-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Sur mobile étroit : empilé */
+@media (max-width: 480px) {
+  .comparison-row {
+    grid-template-columns: 1fr;
+  }
+}
