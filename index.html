@@ -27,9 +27,28 @@
   </header>
 
   <!-- CONTENU PRINCIPAL -->
-  <main class="app-main" id="app-main">
-    <!-- Les vues sont injectées ici dynamiquement -->
-  </main>
+  <!-- Les vues classiques (ranking, match, history, players)
+       sont injectées dynamiquement dans app-main via leur view-*.js -->
+  <main class="app-main" id="app-main"></main>
+
+  <!-- ONGLET STATS — géré séparément car structure fixe avec Canvas -->
+  <section id="tab-stats" class="tab-content hidden">
+    <div class="stats-header">
+      <div class="stats-selectors">
+        <div class="selector-group">
+          <label for="stats-player-a">Joueur A</label>
+          <select id="stats-player-a"></select>
+        </div>
+        <div class="selector-group">
+          <label for="stats-player-b">Joueur B (comparaison)</label>
+          <select id="stats-player-b"></select>
+        </div>
+      </div>
+    </div>
+    <div id="stats-content">
+      <p class="stats-placeholder">Sélectionne un joueur pour voir ses statistiques.</p>
+    </div>
+  </section>
 
   <!-- NAVIGATION BAS -->
   <nav class="app-nav">
@@ -44,6 +63,10 @@
     <button class="nav-btn" data-view="history">
       <span class="nav-icon">📋</span>
       <span class="nav-label">HISTORIQUE</span>
+    </button>
+    <button class="nav-btn" data-view="stats">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">STATS</span>
     </button>
     <button class="nav-btn" data-view="players">
       <span class="nav-icon">👥</span>
@@ -60,17 +83,26 @@
   <div class="toast" id="toast"></div>
 
   <!-- JS — ordre de chargement important -->
+  <!-- Base -->
   <script src="js/config.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/elo.js"></script>
+  <!-- Logique métier -->
   <script src="js/players.js"></script>
   <script src="js/matches.js"></script>
   <script src="js/ranking.js"></script>
+  <!-- Stats -->
+  <script src="js/stats.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/views/view-stats.js"></script>
+  <!-- UI & vues -->
   <script src="js/ui.js"></script>
   <script src="js/views/view-ranking.js"></script>
   <script src="js/views/view-match.js"></script>
   <script src="js/views/view-history.js"></script>
   <script src="js/views/view-players.js"></script>
+  <!-- Point d'entrée — toujours en dernier -->
   <script src="js/app.js"></script>
+
 </body>
 </html>
