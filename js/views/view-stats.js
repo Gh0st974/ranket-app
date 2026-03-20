@@ -137,7 +137,7 @@ function _renderRadarChart(playerIdA, playerIdB = null) {
   }
 
   const dataA = getRadarStats(playerIdA);
-  const playerA = Players.getById(playerIdA);
+  const playerA = Players.findById(playerIdA);
   const labelA = playerA ? Players.fullName(playerA) : 'Joueur A';
 
   // ── Dataset joueur A ──
@@ -154,7 +154,7 @@ function _renderRadarChart(playerIdA, playerIdB = null) {
   // ── Dataset joueur B (si comparaison) ──
   if (playerIdB && playerIdB !== playerIdA) {
     const dataB = getRadarStats(playerIdB);
-    const playerB = Players.getById(playerIdB);
+    const playerB = Players.findById(playerIdB);
     const labelB = playerB ? Players.fullName(playerB) : 'Joueur B';
 
     datasets.push({
