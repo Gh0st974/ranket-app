@@ -158,12 +158,14 @@ const ViewStats = (() => {
             max: 100,
             ticks: { display: false },
             grid: { color: 'rgba(255,255,255,0.1)' },
+            angleLines: { color: 'rgba(255,255,255,0.15)' },
             pointLabels: {
-              color: '#e2e8f0',
-              font: { size: 12 }
+              color: '#f1f5f9',
+              font: { size: 13, weight: 'bold' }
             }
           }
         },
+
         plugins: {
           legend: { display: false }
         }
