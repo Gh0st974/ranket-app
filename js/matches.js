@@ -32,7 +32,7 @@ const Matches = {
     const winnerId = aWins ? playerAId : playerBId;
 
     // Calcul ELO
-    const eloResult = Elo.calculate(playerA.elo, playerB.elo, aWins);
+    const eloResult = Elo.calculate(playerA.elo, playerB.elo, aWins, setsA, setsB);
 
     // Création de l'objet match
     const match = {

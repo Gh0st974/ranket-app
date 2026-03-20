@@ -4,26 +4,44 @@
 const CONFIG = {
 
   // --- ELO ---
-  ELO_DEFAULT: 1000,        // Score ELO de départ pour tout nouveau joueur
+  ELO_DEFAULT: 1000,
 
   // K-factor variable selon le niveau ELO
-  // Plus l'ELO est élevé, moins les points changent (système plus stable)
-  ELO_K_FACTOR: (elo) => {
-    if (elo < 1200) return 40;   // Débutants : changements rapides
-    if (elo < 1600) return 32;   // Intermédiaires
-    if (elo < 2000) return 24;   // Avancés
-    return 20;                   // Experts : classement très stable
+  ELO_K_BRACKETS: [
+    { maxElo: 1200, k: 40 },
+    { maxElo: 1600, k: 32 },
+    { maxElo: 2000, k: 24 },
+    { maxElo: Infinity, k: 20 }
+  ],
+
+  // Multiplicateurs de combativité selon le score en sets
+  // Clé : "setsGagnant-setsPerdant"
+  ELO_SET_MULTIPLIERS: {
+    // Vainqueur
+    '3-0': 1.0,
+    '3-1': 1.2,
+    '3-2': 1.4,
+    '2-0': 1.0,
+    '2-1': 1.2,
+    '1-0': 1.0,
+    // Perdant (clé du point de vue du perdant)
+    '0-3': 0.8,
+    '1-3': 1.1,
+    '2-3': 1.3,
+    '0-2': 0.8,
+    '1-2': 1.1,
+    '0-1': 0.8
   },
 
   // --- SÉRIES ---
-  STREAK_MIN: 3,            // Nombre de victoires consécutives pour afficher la flamme 🔥
+  STREAK_MIN: 3,
 
   // --- RATIO couleurs ---
-  RATIO_RED_MAX: 25,        // 0% → 25% = rouge
-  RATIO_YELLOW_MAX: 60,     // 26% → 60% = jaune, au-dessus = vert
+  RATIO_RED_MAX: 25,
+  RATIO_YELLOW_MAX: 60,
 
   // --- PAGINATION ---
-  ITEMS_PER_PAGE: 8,        // Nombre d'éléments affichés avant le bouton "Afficher plus"
+  ITEMS_PER_PAGE: 8,
 
   // --- FORMATS DE MATCH ---
   FORMATS: {
