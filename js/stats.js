@@ -1,5 +1,5 @@
 // 📄 Fichier : /js/stats.js
-// 🎯 Rôle : Logique métier — calcul des statistiques et head-to-head
+// 🎯 Rôle : Logique métier — calcul des statistiques, head-to-head, radar et rivalités
 // ⚠️ Pas d'import/export — fonctions exposées globalement
 
 /**
@@ -122,4 +122,126 @@ function getEloHistory(playerId) {
   });
 
   return history;
+}
+
+/**
+ * Retourne les 5 axes normalisés (0-100) pour le graphique radar d'un joueur
+ * Axes : Niveau, Régularité, Forme, Combativité, Expérience
+ */
+function getRadarStats(playerId) {
+  const players = Storage.getPlayers();
+  const matches = Storage.getMatches();
+
+  // ── Niveau : ELO normalisé parmi tous les joueurs ──────────────
+  const elos = players.map(p => p.elo || 1000);
+  const minElo = Math.min(...elos);
+  const maxElo = Math.max(...elos);
+  const playerElo = players.find(p => p.id === playerId)?.elo || 1000;
+  const niveau = maxElo === minElo ? 50 : Math.round(((playerElo - minElo) / (maxElo - minElo)) * 100);
+
+  // ── Stats de base du joueur ────────────────────────────────────
+  const playerMatches = matches
+    .filter(m => m.playerAId === playerId || m.playerBId === playerId)
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  const total = playerMatches.length;
+
+  // ── Régularité : winrate global ────────────────────────────────
+  const wins = playerMatches.filter(m => m.winnerId === playerId).length;
+  const regularite = total > 0 ? Math.round((wins / total) * 100) : 0;
+
+  // ── Forme : winrate des 5 derniers matchs ──────────────────────
+  const last5 = [...playerMatches].reverse().slice(0, 5);
+  const winsLast5 = last5.filter(m => m.winnerId === playerId).length;
+  const forme = last5.length > 0 ? Math.round((winsLast5 / last5.length) * 100) : 0;
+
+  // ── Combativité : winrate Bo3+Bo5 vs Bo1 ──────────────────────
+  const longMatches = playerMatches.filter(m => m.format === 'best3' || m.format === 'best5');
+  const longWins = longMatches.filter(m => m.winnerId === playerId).length;
+  const combativite = longMatches.length > 0 ? Math.round((longWins / longMatches.length) * 100) : regularite;
+
+  // ── Expérience : matchs joués normalisé sur tous les joueurs ───
+  const allMatchCounts = players.map(p =>
+    matches.filter(m => m.playerAId === p.id || m.playerBId === p.id).length
+  );
+  const maxMatches = Math.max(...allMatchCounts, 1);
+  const experience = Math.round((total / maxMatches) * 100);
+
+  return {
+    niveau,
+    regularite,
+    forme,
+    combativite,
+    experience,
+    labels: ['💪 Niveau', '🏆 Régularité', '🔥 Forme', '⚔️ Combativité', '📈 Expérience']
+  };
+}
+
+/**
+ * Retourne les rivalités d'un joueur :
+ * - bête noire (celui contre qui il perd le plus)
+ * - victime préférée (celui qu'il bat le plus)
+ * - rival (matchs les plus équilibrés)
+ */
+function getRivalries(playerId) {
+  const players = Storage.getPlayers();
+  const matches = Storage.getMatches();
+
+  // Regrouper les matchs par adversaire
+  const opponents = {};
+
+  matches.forEach(m => {
+    const isA = m.playerAId === playerId;
+    const isB = m.playerBId === playerId;
+    if (!isA && !isB) return;
+
+    const oppId = isA ? m.playerBId : m.playerAId;
+    if (!opponents[oppId]) opponents[oppId] = { wins: 0, losses: 0, total: 0 };
+
+    opponents[oppId].total++;
+    if (m.winnerId === playerId) opponents[oppId].wins++;
+    else opponents[oppId].losses++;
+  });
+
+  // Ne garder que les adversaires avec au moins 2 matchs
+  const eligible = Object.entries(opponents).filter(([, s]) => s.total >= 2);
+  if (eligible.length === 0) return null;
+
+  // Bête noire : meilleur taux de défaite
+  const beteNoire = eligible.reduce((best, curr) => {
+    const ratioB = curr[1].losses / curr[1].total;
+    const ratioBest = best[1].losses / best[1].total;
+    return ratioB > ratioBest ? curr : best;
+  });
+
+  // Victime préférée : meilleur taux de victoire
+  const victime = eligible.reduce((best, curr) => {
+    const ratioC = curr[1].wins / curr[1].total;
+    const ratioB = best[1].wins / best[1].total;
+    return ratioC > ratioB ? curr : best;
+  });
+
+  // Rival : matchs les plus équilibrés (ratio le plus proche de 50%)
+  const rival = eligible.reduce((best, curr) => {
+    const diffC = Math.abs(curr[1].wins / curr[1].total - 0.5);
+    const diffB = Math.abs(best[1].wins / best[1].total - 0.5);
+    return diffC < diffB ? curr : best;
+  });
+
+  const findPlayer = id => players.find(p => p.id === id);
+
+  return {
+    beteNoire: {
+      player: findPlayer(beteNoire[0]),
+      stats: beteNoire[1]
+    },
+    victime: {
+      player: findPlayer(victime[0]),
+      stats: victime[1]
+    },
+    rival: {
+      player: findPlayer(rival[0]),
+      stats: rival[1]
+    }
+  };
 }

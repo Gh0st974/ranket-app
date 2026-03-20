@@ -781,3 +781,74 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Radar ─────────────────────────────────────────────────── */
+.radar-section {
+  margin-top: 1.5rem;
+}
+
+.radar-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* ── Rivalités ─────────────────────────────────────────────── */
+.rivalries-section {
+  margin-top: 1.5rem;
+}
+
+.rivalries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.rivalry-card {
+  background: var(--bg-card, #1e293b);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  border-top: 3px solid transparent;
+}
+
+.rivalry-card--danger  { border-top-color: #ef4444; }
+.rivalry-card--success { border-top-color: #22c55e; }
+.rivalry-card--neutral { border-top-color: #6366f1; }
+
+.rivalry-card__title {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rivalry-card__name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.25rem;
+}
+
+.rivalry-card__elo {
+  font-size: 0.8rem;
+  color: #6366f1;
+  margin-bottom: 0.5rem;
+}
+
+.rivalry-card__record {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.rivalry-card__subtitle {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}

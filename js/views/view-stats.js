@@ -45,35 +45,50 @@ const ViewStats = (() => {
   }
 
   // ─── Rendu principal ───────────────────────────────────────────
-function _renderStats() {
-  const selectA = document.getElementById('stats-player-a');
-  const selectB = document.getElementById('stats-player-b');
-  const container = document.getElementById('stats-content');
-  if (!selectA || !container) return;
+  function _renderStats() {
+    const selectA = document.getElementById('stats-player-a');
+    const selectB = document.getElementById('stats-player-b');
+    const container = document.getElementById('stats-content');
+    if (!selectA || !container) return;
 
-  const idA = selectA.value;
-  const idB = selectB ? selectB.value : '';
+    const idA = selectA.value;
+    const idB = selectB ? selectB.value : '';
 
-  if (!idA) {
-    container.innerHTML = '<p class="stats-placeholder">Sélectionne un joueur pour voir ses statistiques.</p>';
-    return;
-  }
+    if (!idA) {
+      container.innerHTML = '<p class="stats-placeholder">Sélectionne un joueur pour voir ses statistiques.</p>';
+      return;
+    }
 
-  const statsA = getPlayerStats(idA);
-  if (!statsA) return;
+    const statsA = getPlayerStats(idA);
+    if (!statsA) return;
 
-  let html = '';
+    let html = '';
 
-  // ── Mode comparaison : côte à côte ──
-  if (idB && idB !== idA) {
-    const statsB = getPlayerStats(idB);
-    if (statsB) {
-      html += `
-        <div class="comparison-row">
-          ${_buildPlayerCard(statsA, 'a')}
-          ${_buildPlayerCard(statsB, 'b')}
-        </div>
-      `;
+    // ── Mode comparaison : côte à côte ──
+    if (idB && idB !== idA) {
+      const statsB = getPlayerStats(idB);
+      if (statsB) {
+        html += `
+          <div class="comparison-row">
+            ${_buildPlayerCard(statsA, 'a')}
+            ${_buildPlayerCard(statsB, 'b')}
+          </div>
+        `;
+        html += `
+          <div class="chart-section">
+            <h3 class="section-title">Évolution ELO</h3>
+            <div class="chart-wrapper">
+              <canvas id="elo-chart"></canvas>
+            </div>
+          </div>
+        `;
+        html += _buildH2H(idA, idB);
+      }
+    } else {
+      // ── Mode solo : radar + rivalités + chart ──
+      html += _buildPlayerCard(statsA, 'a');
+      html += _buildRadarSection(idA);
+      html += _buildRivalriesSection(idA);
       html += `
         <div class="chart-section">
           <h3 class="section-title">Évolution ELO</h3>
@@ -82,28 +97,137 @@ function _renderStats() {
           </div>
         </div>
       `;
-      html += _buildH2H(idA, idB);
     }
-  } else {
-    // ── Mode solo ──
-    html += _buildPlayerCard(statsA, 'a');
-    html += `
-      <div class="chart-section">
-        <h3 class="section-title">Évolution ELO</h3>
-        <div class="chart-wrapper">
-          <canvas id="elo-chart"></canvas>
+
+    // Injection du HTML dans le DOM
+    container.innerHTML = html;
+
+    // Dessin des graphiques après injection
+    const historyA = getEloHistory(idA);
+    const historyB = (idB && idB !== idA) ? getEloHistory(idB) : null;
+    drawEloChart('elo-chart', historyA, historyB);
+
+    // Radar uniquement en mode solo
+    if (!idB || idB === idA) {
+      _renderRadarChart(idA);
+    }
+  }
+
+  // ─── Radar — HTML ──────────────────────────────────────────────
+  function _buildRadarSection(playerId) {
+    return `
+      <div class="radar-section">
+        <h3 class="section-title">📊 Profil du joueur</h3>
+        <div class="radar-wrapper">
+          <canvas id="radar-chart" width="300" height="300"></canvas>
         </div>
       </div>
     `;
   }
 
-  container.innerHTML = html;
+  // ─── Radar — Dessin Chart.js ───────────────────────────────────
+  function _renderRadarChart(playerId) {
+    const canvas = document.getElementById('radar-chart');
+    if (!canvas) return;
 
-  const historyA = getEloHistory(idA);
-  const historyB = (idB && idB !== idA) ? getEloHistory(idB) : null;
-  drawEloChart('elo-chart', historyA, historyB);
-}
+    // Détruire l'instance précédente si elle existe
+    if (window._radarChartInstance) {
+      window._radarChartInstance.destroy();
+    }
 
+    const data = getRadarStats(playerId);
+
+    window._radarChartInstance = new Chart(canvas, {
+      type: 'radar',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          label: 'Profil',
+          data: [data.niveau, data.regularite, data.forme, data.combativite, data.experience],
+          backgroundColor: 'rgba(99, 102, 241, 0.2)',
+          borderColor: 'rgba(99, 102, 241, 1)',
+          borderWidth: 2,
+          pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { display: false },
+            grid: { color: 'rgba(255,255,255,0.1)' },
+            pointLabels: {
+              color: '#e2e8f0',
+              font: { size: 12 }
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+
+  // ─── Rivalités — HTML ──────────────────────────────────────────
+  function _buildRivalriesSection(playerId) {
+    const data = getRivalries(playerId);
+    if (!data) return `
+      <div class="rivalries-section">
+        <h3 class="section-title">⚔️ Rivalités</h3>
+        <p class="stats-placeholder">Pas assez de matchs pour calculer les rivalités (2 matchs minimum par adversaire).</p>
+      </div>
+    `;
+
+    const { beteNoire, victime, rival } = data;
+
+    return `
+      <div class="rivalries-section">
+        <h3 class="section-title">⚔️ Rivalités</h3>
+        <div class="rivalries-grid">
+          ${_buildRivalryCard(
+            '😈 Bête noire',
+            beteNoire.player,
+            `${beteNoire.stats.losses}D / ${beteNoire.stats.total} matchs`,
+            `${Math.round((beteNoire.stats.losses / beteNoire.stats.total) * 100)}% de défaites`,
+            'rivalry-card--danger'
+          )}
+          ${_buildRivalryCard(
+            '😎 Victime préférée',
+            victime.player,
+            `${victime.stats.wins}V / ${victime.stats.total} matchs`,
+            `${Math.round((victime.stats.wins / victime.stats.total) * 100)}% de victoires`,
+            'rivalry-card--success'
+          )}
+          ${_buildRivalryCard(
+            '🤜 Rival',
+            rival.player,
+            `${rival.stats.wins}V ${rival.stats.losses}D`,
+            `${rival.stats.total} matchs au coude à coude`,
+            'rivalry-card--neutral'
+          )}
+        </div>
+      </div>
+    `;
+  }
+
+  // ─── Rivalités — Card individuelle ────────────────────────────
+  function _buildRivalryCard(title, player, record, subtitle, cssClass) {
+    if (!player) return '';
+    const name = Players.fullName(player);
+    const elo = player.elo || 1000;
+    return `
+      <div class="rivalry-card ${cssClass}">
+        <div class="rivalry-card__title">${title}</div>
+        <div class="rivalry-card__name">${name}</div>
+        <div class="rivalry-card__elo">${elo} ELO</div>
+        <div class="rivalry-card__record">${record}</div>
+        <div class="rivalry-card__subtitle">${subtitle}</div>
+      </div>
+    `;
+  }
 
   // ─── Carte joueur ──────────────────────────────────────────────
   function _buildPlayerCard(stats, side) {
