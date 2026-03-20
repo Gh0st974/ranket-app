@@ -7,8 +7,8 @@ const ViewStats = (() => {
 
   // ─── Point d'entrée ───────────────────────────────────────────
   function render() {
-  _bindSelectors();    // Clone d'abord
-  _populateSelectors(); // Puis remplit les nouveaux éléments
+  _populateSelectors(); // en premier
+  _bindSelectors();     // en second
   _renderStats();
   }
 
@@ -32,17 +32,19 @@ const ViewStats = (() => {
 
   // ─── Binding des événements ────────────────────────────────────
   function _bindSelectors() {
-    const selectA = document.getElementById('stats-player-a');
-    const selectB = document.getElementById('stats-player-b');
-    if (!selectA || !selectB) return;
+  const selectA = document.getElementById('stats-player-a');
+  const selectB = document.getElementById('stats-player-b');
+  if (!selectA || !selectB) return;
 
-    // Évite les doublons d'écouteurs si render() est rappelé
-    selectA.replaceWith(selectA.cloneNode(true));
-    selectB.replaceWith(selectB.cloneNode(true));
+  const newA = selectA.cloneNode(true); // garde le contenu
+  const newB = selectB.cloneNode(true);
+  selectA.replaceWith(newA);
+  selectB.replaceWith(newB);
 
-    document.getElementById('stats-player-a').addEventListener('change', _renderStats);
-    document.getElementById('stats-player-b').addEventListener('change', _renderStats);
-  }
+  document.getElementById('stats-player-a').addEventListener('change', _renderStats);
+  document.getElementById('stats-player-b').addEventListener('change', _renderStats);
+}
+
 
   // ─── Rendu principal ───────────────────────────────────────────
   function _renderStats() {
