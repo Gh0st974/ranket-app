@@ -169,8 +169,8 @@ function _renderStats() {
 
     const matchesHTML = h2h.matches.slice(0, 10).map(m => {
       const winnerIsA = m.winnerId === idA;
-      const date = new Date(m.date).toLocaleDateString('fr-FR');
-      const delta = m.eloDelta || '?';
+      const date = new Date(m.timestamp).toLocaleDateString('fr-FR');
+      const delta = Math.abs(m.deltaA) || '?';
       return `
         <div class="h2h-match-row ${winnerIsA ? 'win-a' : 'win-b'}">
           <span class="h2h-match-winner">${winnerIsA ? Players.fullName(h2h.playerA) : Players.fullName(h2h.playerB)} gagne</span>
