@@ -782,73 +782,127 @@
   }
 }
 
-/* ── Radar ─────────────────────────────────────────────────── */
-.radar-section {
-  margin-top: 1.5rem;
-}
-
-.radar-wrapper {
+/* ─── Stats : Sélecteurs joueurs ─────────────────────────────── */
+.selector-group {
   display: flex;
-  justify-content: center;
-  padding: 1rem 0;
-  max-width: 320px;
-  margin: 0 auto;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
 }
 
-/* ── Rivalités ─────────────────────────────────────────────── */
-.rivalries-section {
-  margin-top: 1.5rem;
-}
-
-.rivalries-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.rivalry-card {
-  background: var(--bg-card, #1e293b);
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: center;
-  border-top: 3px solid transparent;
-}
-
-.rivalry-card--danger  { border-top-color: #ef4444; }
-.rivalry-card--success { border-top-color: #22c55e; }
-.rivalry-card--neutral { border-top-color: #6366f1; }
-
-.rivalry-card__title {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.rivalry-card__name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #f1f5f9;
-  margin-bottom: 0.25rem;
-}
-
-.rivalry-card__elo {
+.selector-group label {
   font-size: 0.8rem;
-  color: #6366f1;
-  margin-bottom: 0.5rem;
+  color: #666;
+  text-align: center;
 }
 
-.rivalry-card__record {
+.selector-group select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* ─── Stats : Tableau comparatif ─────────────────────────────── */
+.cmp-table {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.cmp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.cmp-badge {
+  flex: 1;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.badge-a {
+  background: #e8e0ff;
+  color: #6c3fcf;
+  border: 2px solid #6c3fcf;
+}
+
+.badge-b {
+  background: #ffe0e0;
+  color: #cf3f3f;
+  border: 2px solid #cf3f3f;
+}
+
+.cmp-vs {
+  font-weight: 900;
   font-size: 1rem;
-  font-weight: 600;
-  color: #e2e8f0;
+  color: #e63946;
+  text-align: center;
+  min-width: 32px;
 }
 
-.rivalry-card__subtitle {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  margin-top: 0.25rem;
+.cmp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cmp-row:last-child {
+  border-bottom: none;
+}
+
+.cmp-label {
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  flex: 1.2;
+  font-size: 0.8rem;
+}
+
+.cmp-val-a {
+  flex: 1;
+  text-align: left;
+  color: #444;
+}
+
+.cmp-val-b {
+  flex: 1;
+  text-align: right;
+  color: #444;
+}
+
+/* ─── Stats : Graphique ELO ───────────────────────────────────── */
+.elo-chart-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-bottom: 20px;
+}
+
+.elo-chart-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+#elo-chart-canvas {
+  width: 100%;
+  height: 200px;
+  display: block;
 }
