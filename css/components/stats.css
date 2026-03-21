@@ -1,0 +1,238 @@
+/* 📄 Fichier : /css/components/stats.css
+   🎯 Rôle : Styles de l'onglet statistiques (graphiques, H2H, comparaison...) */
+
+/* ===== HEADER STATS ===== */
+.stats-header {
+  padding: 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-selectors {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stats-placeholder {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 3rem 1rem;
+  font-size: 1rem;
+}
+
+/* ===== SECTIONS STATS ===== */
+.stats-section {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+/* ===== GRAPHIQUE ELO ===== */
+.chart-wrapper {
+  width: 100%;
+  height: 260px;
+  position: relative;
+}
+
+.chart-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-tooltip {
+  position: fixed;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+  pointer-events: none;
+  display: none;
+  z-index: 9999;
+  line-height: 1.6;
+}
+
+.chart-tooltip .tt-elo              { font-weight: 700; font-size: 1rem; }
+.chart-tooltip .tt-delta.won        { color: #4caf50; }
+.chart-tooltip .tt-delta.lost       { color: #e63946; }
+.chart-tooltip .tt-opp              { color: #aaa; }
+.chart-tooltip .tt-date             { color: #666; font-size: 0.75rem; }
+
+/* ===== SECTION GRAPHIQUE ELO ===== */
+.elo-chart-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-bottom: 20px;
+}
+
+.elo-chart-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+#elo-chart-canvas {
+  width: 100%;
+  height: 200px;
+  display: block;
+}
+
+/* ===== CARTES STATS ===== */
+.stats-cards-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 260px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-card-name { font-weight: 700; font-size: 1.05rem; }
+.stat-card-elo  { color: var(--accent); font-weight: 700; }
+
+.stat-rows { padding: 0.5rem 0; }
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-row:last-child { border-bottom: none; }
+.stat-row span       { color: var(--text-muted); }
+
+/* ===== HEAD TO HEAD ===== */
+.h2h-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.h2h-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.h2h-player.right  { align-items: center; }
+.h2h-name          { font-size: 0.9rem; color: var(--text-muted); }
+.h2h-wins          { font-size: 2.5rem; font-weight: 900; }
+.h2h-player.winner .h2h-wins { color: var(--accent); }
+.h2h-vs            { font-size: 1rem; color: var(--text-muted); }
+
+.h2h-match-row {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--surface);
+  border-left: 3px solid transparent;
+}
+
+.h2h-match-row.win-a  { border-left-color: #e63946; }
+.h2h-match-row.win-b  { border-left-color: #457b9d; }
+.h2h-match-date       { color: var(--text-muted); font-size: 0.78rem; }
+.h2h-match-delta      { color: var(--text-muted); }
+
+/* ===== COMPARAISON CÔTE À CÔTE ===== */
+.comparison-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 480px) {
+  .comparison-row { grid-template-columns: 1fr; }
+}
+
+/* ===== TABLEAU COMPARATIF ===== */
+.cmp-table {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.cmp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.cmp-badge {
+  flex: 1;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.badge-a { background: #e8e0ff; color: #6c3fcf; border: 2px solid #6c3fcf; }
+.badge-b { background: #ffe0e0; color: #cf3f3f; border: 2px solid #cf3f3f; }
+
+.cmp-vs {
+  font-weight: 900;
+  font-size: 1rem;
+  color: #e63946;
+  text-align: center;
+  min-width: 32px;
+}
+
+.cmp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cmp-row:last-child { border-bottom: none; }
+
+.cmp-label {
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  flex: 1.2;
+  font-size: 0.8rem;
+}
+
+.cmp-val-a { flex: 1; text-align: left;  color: #444; }
+.cmp-val-b { flex: 1; text-align: right; color: #444; }

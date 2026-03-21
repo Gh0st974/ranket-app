@@ -1,0 +1,180 @@
+/* 📄 Fichier : /css/components/match-cards.css
+   🎯 Rôle : Styles des cartes de match dans l'historique */
+
+/* ===== CARTE ===== */
+.match-card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ===== LIGNE 1 : en-tête ===== */
+.match-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.match-date {
+  font-size: 0.72rem; /* ← diminué */
+  color: #888;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1; /* ← occupe l'espace gauche */
+}
+
+.match-format-badge {
+  background: #eee;
+  color: #555;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex: 1; /* ← occupe l'espace central */
+  text-align: center; /* ← centré */
+}
+
+.match-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1; /* ← occupe l'espace droite */
+  justify-content: flex-end;
+}
+
+/* ===== LIGNE 2 : joueurs + score ===== */
+.match-players {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* Bloc joueur gauche */
+.match-player--left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0; /* ← permet le ellipsis */
+}
+
+/* Bloc joueur droite */
+.match-player--right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  min-width: 0; /* ← permet le ellipsis */
+}
+
+/* Nom + trophée sur la même ligne */
+.match-player-nameline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.match-player-name {
+  font-size: 0.82rem; /* ← diminué */
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;       /* ← une seule ligne */
+  overflow: hidden;          /* ← cache le dépassement */
+  text-overflow: ellipsis;   /* ← "..." si trop long */
+}
+
+.match-player-name.winner { color: #e63946; }
+
+.winner-trophy { font-size: 1rem; flex-shrink: 0; }
+
+/* ELO sous le nom */
+.match-player-elo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.elo-track {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.elo-delta-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+}
+
+.elo-gain { background: #e6f9ec; color: #2dc653; }
+.elo-loss { background: #fdecea; color: #e63946; }
+
+/* Bloc score central */
+.match-score-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+.match-score-badge {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #222;
+  white-space: nowrap;
+}
+
+/* ===== LIGNE 3 : sets ===== */
+.match-sets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.set-badge {
+  background: #eee;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  color: #444;
+  font-weight: 600;
+}
+
+/* ===== LISTE JOUEURS (vue joueurs) ===== */
+.player-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.player-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-list-name  { font-weight: 700; font-size: 0.9rem; }
+.player-list-stats { font-size: 0.72rem; color: #888; }
+
+.player-list-actions {
+  display: flex;
+  gap: 6px;
+}

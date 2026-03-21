@@ -1,0 +1,209 @@
+/* 📄 Fichier : /css/components/forms.css
+   🎯 Rôle : Styles des formulaires (match, joueur, sets...) */
+
+/* ===== SÉLECTEUR FORMAT ===== */
+.format-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+/* ===== BLOC VS (sélection joueurs) ===== */
+.vs-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.player-select-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.player-select-block label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.player-select-block select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: white;
+}
+
+.vs-label {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #e63946;
+}
+
+/* ===== PROBA ELO ===== */
+.elo-proba-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.proba-highlight { color: #e63946; font-weight: 700; }
+
+/* ===== SECTION SETS ===== */
+.sets-section         { margin-bottom: 16px; }
+.sets-section h3      { font-size: 0.9rem; font-weight: 700; margin-bottom: 10px; }
+
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.set-label {
+  width: 50px;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  flex-shrink: 0;
+}
+
+.set-input {
+  width: 60px;
+  text-align: center;
+  padding: 8px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.set-separator {
+  font-size: 1.1rem;
+  color: var(--color-text-light);
+  flex-shrink: 0;
+}
+
+/* ===== SCORE FINAL ===== */
+.final-score-block {
+  background: #fff0f1;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.final-score-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e63946;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.final-score-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.final-score-number {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #e63946;
+}
+
+/* ===== FORMULAIRE AJOUT JOUEUR ===== */
+.add-player-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.add-player-form input {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+/* ===== SÉLECTEURS STATS ===== */
+.selector-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+}
+
+.selector-group label {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+}
+
+.selector-group select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* ===== CSV IMPORT ===== */
+.csv-import-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.csv-file-name {
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+}
+
+#csv-file-input { display: none; }
+
+/* ===== FILTRE HISTORIQUE ===== */
+.history-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.history-filters select {
+  flex: 1;
+  min-width: 120px;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  background: white;
+}
+
+/* ===== CHECKBOX SÉLECTION ===== */
+.select-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #e63946;
+  cursor: pointer;
+}
