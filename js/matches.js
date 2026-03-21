@@ -137,8 +137,8 @@ const Matches = {
   _countSets(sets) {
   let setsA = 0, setsB = 0;
   sets.forEach(s => {
-    const a = Number(s.a);
-    const b = Number(s.b);
+    const a = Number(s.b);
+    const b = Number(s.a);
     if (a > b) setsA++;
     else if (b > a) setsB++;
   });
