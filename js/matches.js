@@ -21,8 +21,8 @@ const Matches = {
     if (!playerA || !playerB) return null;
 
     const { setsA, setsB } = this._countSets(sets);
-    const aWins = setsA > setsB;
-    const winnerId = aWins ? playerAId : playerBId;
+    const aWins     = setsA > setsB;
+    const winnerId  = aWins ? playerAId : playerBId;
     const eloResult = Elo.calculate(playerA.elo, playerB.elo, aWins, sets);
 
     const match = {
@@ -47,7 +47,7 @@ const Matches = {
     matches.push(match);
     Storage.saveMatches(matches);
 
-    Players.applyMatchResult(playerAId, aWins,  eloResult.deltaA);
+    Players.applyMatchResult(playerAId,  aWins, eloResult.deltaA);
     Players.applyMatchResult(playerBId, !aWins, eloResult.deltaB);
 
     return match;
@@ -58,7 +58,7 @@ const Matches = {
     if (!match) return;
 
     const aWon = match.winnerId === match.playerAId;
-    Players.reverseMatchResult(match.playerAId, aWon,  match.deltaA);
+    Players.reverseMatchResult(match.playerAId,  aWon, match.deltaA);
     Players.reverseMatchResult(match.playerBId, !aWon, match.deltaB);
     Players.recalculateStreak(match.playerAId);
     Players.recalculateStreak(match.playerBId);
@@ -70,6 +70,7 @@ const Matches = {
   removeMany(matchIds) {
     matchIds.forEach(id => this.remove(id));
   },
+
   update(matchId, changes) {
     const all = this.getAll();
     const idx = all.findIndex(m => m.id === matchId);
@@ -80,25 +81,32 @@ const Matches = {
   },
 
   _recalcAllElo() {
+    // 1. Reset tous les joueurs en mémoire
     const players = Players.getAll();
     players.forEach(p => {
-      p.elo    = CONFIG.ELO_DEFAULT;
-      p.wins   = 0;
-      p.losses = 0;
-      p.streak = 0;
-      p.matchesPlayed = 0;
+      p.elo     = CONFIG.ELO_DEFAULT;
+      p.wins    = 0;
+      p.losses  = 0;
+      p.streak  = 0;
+      p.matches = 0;
     });
-    Storage.savePlayers(players);
 
+    // 2. Cache local pour éviter toute relecture Storage pendant la boucle
+    const cache = {};
+    players.forEach(p => cache[p.id] = p);
+
+    // 3. Rejoue tous les matchs dans l'ordre chronologique
     const matches = this.getAll().sort((a, b) => a.timestamp - b.timestamp);
+
     matches.forEach(m => {
-      const pA = Players.findById(m.playerAId);
-      const pB = Players.findById(m.playerBId);
+      const pA = cache[m.playerAId];
+      const pB = cache[m.playerBId];
       if (!pA || !pB) return;
 
       const aWins     = m.winnerId === m.playerAId;
       const eloResult = Elo.calculate(pA.elo, pB.elo, aWins, m.sets);
 
+      // Met à jour les données du match
       m.eloA      = pA.elo;
       m.eloB      = pB.elo;
       m.deltaA    = eloResult.deltaA;
@@ -106,9 +114,23 @@ const Matches = {
       m.eloAAfter = pA.elo + eloResult.deltaA;
       m.eloBAfter = pB.elo + eloResult.deltaB;
 
-      Players.applyMatchResult(m.playerAId,  aWins, eloResult.deltaA);
-      Players.applyMatchResult(m.playerBId, !aWins, eloResult.deltaB);
+      // Met à jour le cache en mémoire (pas de relecture Storage)
+      pA.elo      += eloResult.deltaA;
+      pB.elo      += eloResult.deltaB;
+      pA.matches  += 1;
+      pB.matches  += 1;
+
+      if (aWins) { pA.wins++; pB.losses++; }
+      else       { pB.wins++; pA.losses++; }
     });
+
+    // 4. Calcul des streaks depuis le cache (sans relire Storage)
+    players.forEach(p => {
+      p.streak = Players.computeStreak(p.id, matches);
+    });
+
+    // 5. Une seule écriture en Storage à la fin
+    Storage.savePlayers(players);
     Storage.saveMatches(matches);
   },
 
@@ -135,7 +157,7 @@ const Matches = {
   },
 
   formatDate(timestamp) {
-    const d = new Date(timestamp);
+    const d    = new Date(timestamp);
     const date = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
     const time = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
     return `${date} à ${time}`;

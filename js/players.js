@@ -50,16 +50,6 @@ const Players = {
     Storage.savePlayers(players);
   },
 
-  /** Met à jour un joueur directement (usage interne recalcul ELO) */
-  updateRaw(player) {
-    const all = this.getAll();
-    const idx = all.findIndex(p => p.id === player.id);
-    if (idx !== -1) {
-      all[idx] = player;
-      Storage.savePlayers(all);
-    }
-  },
-
   findById(playerId) {
     return this.getAll().find(p => p.id === playerId) || null;
   },
@@ -92,14 +82,12 @@ const Players = {
     const player = this.findById(playerId);
     if (!player) return;
 
-    const newStreak = won ? player.streak + 1 : 0;
-
     this.update(playerId, {
       elo:     player.elo + eloDelta,
-      wins:    player.wins    + (won ? 1 : 0),
-      losses:  player.losses  + (won ? 0 : 1),
+      wins:    player.wins   + (won ? 1 : 0),
+      losses:  player.losses + (won ? 0 : 1),
       matches: player.matches + 1,
-      streak:  newStreak
+      streak:  won ? player.streak + 1 : 0
     });
   },
 
@@ -109,8 +97,8 @@ const Players = {
 
     this.update(playerId, {
       elo:     player.elo - eloDelta,
-      wins:    Math.max(0, player.wins    - (won ? 1 : 0)),
-      losses:  Math.max(0, player.losses  - (won ? 0 : 1)),
+      wins:    Math.max(0, player.wins   - (won ? 1 : 0)),
+      losses:  Math.max(0, player.losses - (won ? 0 : 1)),
       matches: Math.max(0, player.matches - 1)
     });
   },
@@ -127,6 +115,20 @@ const Players = {
     }
 
     this.update(playerId, { streak });
+  },
+
+  /** Calcule le streak d'un joueur depuis une liste de matchs en mémoire (sans relire Storage) */
+  computeStreak(playerId, matches) {
+    const playerMatches = [...matches]
+      .filter(m => m.playerAId === playerId || m.playerBId === playerId)
+      .sort((a, b) => b.timestamp - a.timestamp);
+
+    let streak = 0;
+    for (const match of playerMatches) {
+      if (match.winnerId === playerId) streak++;
+      else break;
+    }
+    return streak;
   },
 
   _capitalize(str) {
