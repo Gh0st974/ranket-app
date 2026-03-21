@@ -29,7 +29,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== HEADER ===== */
+/* ===== HEADER GÉNÉRIQUE ===== */
 .modal-header {
   display: flex;
   align-items: center;
@@ -60,18 +60,16 @@
   color: #e63946;
 }
 
-/* ===== BODY ===== */
+/* ===== BODY GÉNÉRIQUE ===== */
 .modal-body {
   padding: 1.2rem 1.4rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  /* Scroll si le contenu déborde (ex: beaucoup de sets) */
   max-height: 75vh;
   overflow-y: auto;
 }
 
-/* Noms des joueurs */
 .edit-players-label {
   text-align: center;
   font-size: 1rem;
@@ -83,7 +81,6 @@
   margin: 0;
 }
 
-/* Groupes de champs */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -118,76 +115,16 @@
   background: #fff;
 }
 
-/* ===== EN-TÊTE DES COLONNES DE SETS ===== */
-.sets-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  text-align: center;
-  gap: 0.4rem;
-  padding: 0 2.4rem 0 0.4rem; /* aligne avec les inputs, compense le bouton ✕ */
-  margin-bottom: 0.2rem;
-}
-
-.sets-player-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ===== LISTE DES SETS ===== */
-#edit-sets-list {
+/* ===== FOOTER GÉNÉRIQUE ===== */
+.modal-footer {
   display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.9rem 1.4rem 1.2rem;
+  border-top: 1px solid #f0f0f0;
 }
 
-/* ===== LIGNE D'UN SET ===== */
-.set-row {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr auto;
-  align-items: center;
-  gap: 0.4rem;
-  background: #f7f7f7;
-  border-radius: 10px;
-  padding: 0.5rem 0.6rem;
-}
-
-/* Input score dans un set */
-.set-row .score-input {
-  width: 100%;
-  text-align: center;
-  font-size: 1.15rem;
-  font-weight: 700;
-  padding: 0.35rem 0.2rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background: #fff;
-  color: var(--color-primary, #e63946);
-  outline: none;
-  transition: border-color 0.15s;
-  box-sizing: border-box;
-}
-
-.set-row .score-input:focus {
-  border-color: var(--color-primary, #e63946);
-  background: #fff;
-}
-
-/* Séparateur – entre les deux scores */
-.set-row .score-separator {
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: #bbb;
-  text-align: center;
-}
-
-/* Bouton supprimer un set */
+/* ===== BOUTONS SETS ===== */
 .btn-remove-set {
   background: none;
   border: none;
@@ -206,131 +143,100 @@
   background: #ffeaea;
 }
 
-/* ===== BOUTON AJOUTER UN SET ===== */
 .btn-sm {
   font-size: 0.82rem;
   padding: 0.35rem 0.8rem;
   border-radius: 8px;
-  margin-top: 0.15rem;
-  align-self: flex-start;
 }
 
-/* ===== SCORE ROW (ancienne structure, conservée) ===== */
-.edit-score-row {
+/* ===== MODAL ÉDITION MATCH ===== */
+
+/* Header */
+.em-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  background: #f7f7f7;
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
+  justify-content: flex-end;
+  padding: 0.6rem 1rem 0;
 }
 
-.edit-score-row span {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--color-text);
+/* Body scrollable */
+.em-body {
+  padding: 0 1.4rem 0.8rem;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-.score-separator {
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: #bbb;
-}
-
-.score-input {
-  width: 3.2rem;
+/* DATE */
+.em-date-block {
   text-align: center;
-  font-size: 1.3rem;
+  margin-bottom: 1.2rem;
+}
+
+.em-date-label {
+  font-size: 1.1rem;
   font-weight: 700;
-  padding: 0.3rem 0.2rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background: #fff;
-  color: var(--color-primary, #e63946);
+  color: #e63946;
+  margin-bottom: 8px;
+}
+
+.em-date-input {
+  padding: 8px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  text-align: center;
   outline: none;
   transition: border-color 0.15s;
 }
 
-.score-input:focus {
-  border-color: var(--color-primary, #e63946);
+.em-date-input:focus {
+  border-color: #e63946;
 }
 
-/* ===== FOOTER ===== */
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 0.9rem 1.4rem 1.2rem;
-  border-top: 1px solid #f0f0f0;
-}
-
-
-/* ===== EDIT MATCH - NOUVEAU LAYOUT ===== */
-
-.em-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.6rem 0.8rem 0;
-}
-
-.em-body {
-  padding: 0 1.4rem 0.5rem;
-}
-
-/* Date */
-.em-date-block {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.em-date-label {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #e63946;
-  margin-bottom: 6px;
-}
-
-.em-date-input {
-  padding: 7px 12px;
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* Joueurs face à face */
+/* JOUEURS */
 .em-players-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  gap: 8px;
 }
 
 .em-player-name {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  color: var(--color-text);
+  max-width: 44%;
+  word-break: break-word;
 }
 
-/* Format centré */
+/* FORMAT */
 .em-format-row {
   display: flex;
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .em-format-select {
-  padding: 7px 14px;
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  padding: 8px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.88rem;
   background: #fff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
 }
 
-/* Sets */
+.em-format-select:focus {
+  border-color: #e63946;
+}
+
+/* SETS */
 .em-sets-list {
-  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .em-set-row {
@@ -338,21 +244,26 @@
   grid-template-columns: 1fr auto 1fr auto;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
 }
 
 .em-set-input {
   width: 100%;
   text-align: center;
-  padding: 8px 4px;
+  padding: 10px 4px;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
   font-weight: 700;
   background: #bbb;
   color: #fff;
   outline: none;
   box-sizing: border-box;
+  -moz-appearance: textfield;
+}
+
+.em-set-input::-webkit-outer-spin-button,
+.em-set-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }
 
 .em-set-input:focus {
@@ -364,47 +275,50 @@
   font-size: 0.82rem;
   color: #888;
   background: #eee;
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 8px;
+  padding: 8px 10px;
   white-space: nowrap;
 }
 
-/* Bouton ajouter set */
+/* BOUTON AJOUTER SET */
 .em-add-set-btn {
-  margin-bottom: 14px;
+  margin-bottom: 18px;
+  color: #e63946;
+  border-color: #e63946;
+  border-radius: 20px;
 }
 
-/* Score final */
+/* SCORE FINAL */
 .em-score-final {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  margin-bottom: 10px;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
 .em-score-number {
-  width: 54px;
+  width: 58px;
   text-align: center;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 900;
   color: #e63946;
-  border: 2px solid #e63946;
-  border-radius: 10px;
+  border: 2.5px solid #e63946;
+  border-radius: 12px;
   padding: 6px 0;
 }
 
 .em-score-badge {
   background: #e63946;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 1px;
-  border-radius: 8px;
-  padding: 8px 16px;
+  border-radius: 10px;
+  padding: 10px 20px;
 }
 
-/* Footer */
+/* FOOTER */
 .em-footer {
   display: flex;
   align-items: center;
@@ -414,7 +328,7 @@
 }
 
 .em-footer-title {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #555;
 }
