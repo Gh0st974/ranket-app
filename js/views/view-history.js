@@ -89,7 +89,6 @@ const ViewHistory = {
   },
 
   /** Construit la carte HTML d'un match */
-  /** Construit la carte HTML d'un match */
 _buildCard(match) {
   const pA = Players.findById(match.playerAId);
   const pB = Players.findById(match.playerBId);
@@ -101,23 +100,22 @@ _buildCard(match) {
   const fmt   = CONFIG.FORMATS[match.format]?.label || match.format;
   const date  = Matches.formatDate(match.timestamp);
 
-  // ✅ ELO avant/après corrigé
+  // ELO
   const eloABefore = match.eloA ?? '—';
   const eloBBefore = match.eloB ?? '—';
   const eloAAfter  = match.eloAAfter ?? (match.eloA != null ? match.eloA + (match.deltaA ?? 0) : '—');
   const eloBAfter  = match.eloBAfter ?? (match.eloB != null ? match.eloB + (match.deltaB ?? 0) : '—');
-
   const deltaASign = (match.deltaA ?? 0) >= 0 ? '+' : '';
   const deltaBSign = (match.deltaB ?? 0) >= 0 ? '+' : '';
   const deltaACls  = (match.deltaA ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
   const deltaBCls  = (match.deltaB ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
 
-  // Badges sets
+  // Sets
   const setsDetail = (match.sets || []).map((s, i) =>
     `<span class="set-badge">Set ${i + 1} : ${s.a} - ${s.b}</span>`
   ).join('');
 
-  // Checkbox si mode sélection actif
+  // Checkbox si mode sélection
   const checkbox = this._selectMode
     ? `<input type="checkbox" class="select-checkbox history-check" data-id="${match.id}">`
     : '';
@@ -125,52 +123,58 @@ _buildCard(match) {
   return `
     <div class="match-card" data-id="${match.id}">
 
-      <!-- Ligne 1 : Date | Format centré | Actions -->
+      <!-- Ligne 1 : Date | Format | Actions -->
       <div class="match-card-header">
-        <span class="match-date">${date}</span>
-        <span class="match-format-badge">${fmt}</span>
+        <span class="match-date">📅 ${date}</span>
+        <span class="match-format-badge">Format : ${fmt}</span>
         <div class="match-actions">
           ${checkbox}
-          <button class="icon-btn icon-btn-edit" data-edit="${match.id}">✏️</button>
-          <button class="icon-btn icon-btn-delete" data-delete="${match.id}">🗑️</button>
+          <button class="icon-btn icon-btn-edit"   data-edit="${match.id}">✏️</button>
+          <button class="icon-btn icon-btn-delete"  data-delete="${match.id}">🗑️</button>
         </div>
       </div>
 
-      <!-- Ligne 2 : Joueur A | trophée+score+trophée | Joueur B -->
+      <!-- Ligne 2 : Joueur A | Score | Joueur B -->
       <div class="match-players">
-        <div class="match-player match-player--left">
-          <span class="match-player-name ${aWon ? 'winner' : ''}">${nameA}</span>
+
+        <!-- Joueur A (gauche) -->
+        <div class="match-player--left">
+          <div class="match-player-nameline">
+            ${aWon ? '<span class="winner-trophy">🏆</span>' : ''}
+            <span class="match-player-name ${aWon ? 'winner' : ''}">${nameA}</span>
+          </div>
+          <div class="match-player-elo">
+            <span class="elo-track">${eloABefore} › ${eloAAfter}</span>
+            <span class="elo-delta-badge ${deltaACls}">${deltaASign}${match.deltaA ?? 0}</span>
+          </div>
         </div>
 
+        <!-- Score central -->
         <div class="match-score-center">
-          ${aWon ? '<span class="winner-trophy">🏆</span>' : '<span class="winner-trophy-empty"></span>'}
           <span class="match-score-badge">${match.setsA} - ${match.setsB}</span>
-          ${!aWon ? '<span class="winner-trophy">🏆</span>' : '<span class="winner-trophy-empty"></span>'}
         </div>
 
-        <div class="match-player match-player--right">
-          <span class="match-player-name ${!aWon ? 'winner' : ''}">${nameB}</span>
+        <!-- Joueur B (droite) -->
+        <div class="match-player--right">
+          <div class="match-player-nameline">
+            <span class="match-player-name ${!aWon ? 'winner' : ''}">${nameB}</span>
+            ${!aWon ? '<span class="winner-trophy">🏆</span>' : ''}
+          </div>
+          <div class="match-player-elo">
+            <span class="elo-delta-badge ${deltaBCls}">${deltaBSign}${match.deltaB ?? 0}</span>
+            <span class="elo-track">${eloBBefore} › ${eloBAfter}</span>
+          </div>
         </div>
+
       </div>
 
-      <!-- Ligne 3 : ELO avant > après + delta -->
-      <div class="match-elo-row">
-        <div class="match-elo-block match-elo-block--left">
-          <span class="elo-track">${eloABefore} › ${eloAAfter}</span>
-          <span class="elo-delta-badge ${deltaACls}">${deltaASign}${match.deltaA ?? 0}</span>
-        </div>
-        <div class="match-elo-block match-elo-block--right">
-          <span class="elo-track">${eloBBefore} › ${eloBAfter}</span>
-          <span class="elo-delta-badge ${deltaBCls}">${deltaBSign}${match.deltaB ?? 0}</span>
-        </div>
-      </div>
-
-      <!-- Ligne 4 : Sets -->
+      <!-- Ligne 3 : Sets -->
       <div class="match-sets">${setsDetail}</div>
 
     </div>
   `;
 },
+
 
 
   /** Attache les événements */

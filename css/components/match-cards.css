@@ -17,13 +17,15 @@
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 12px;
-  flex-wrap: wrap;
 }
 
 .match-date {
   font-size: 0.78rem;
-  color: #666;
+  color: #888;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .match-format-badge {
@@ -31,12 +33,12 @@
   color: #555;
   font-size: 0.75rem;
   font-weight: 600;
-  padding: 3px 10px;
+  padding: 3px 12px;
   border-radius: 20px;
   white-space: nowrap;
 }
 
-.match-card-actions {
+.match-actions {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -45,96 +47,94 @@
 /* ===== LIGNE 2 : joueurs + score ===== */
 .match-players {
   display: grid;
-  grid-template-columns: 1fr auto 1fr; /* ← gauche | score | droite */
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-  min-height: 42px;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-.match-player {
+/* Bloc joueur gauche */
+.match-player--left {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-  min-width: 0;
+  gap: 3px;
 }
 
-.match-player--left  { justify-content: flex-start; }
-.match-player--right { justify-content: flex-end; flex-direction: row-reverse; }
+/* Bloc joueur droite */
+.match-player--right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+/* Nom + trophée sur la même ligne */
+.match-player-nameline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 
 .match-player-name {
   font-size: 0.95rem;
   font-weight: 700;
   color: #333;
-  word-break: break-word;   /* ← coupe si vraiment trop long */
-  overflow-wrap: break-word;
-  white-space: normal;      /* ← autorise le passage à la ligne */
-  max-width: 100%;
+  word-break: break-word;
 }
 
 .match-player-name.winner { color: #e63946; }
 
-.winner-trophy { font-size: 1rem; flex-shrink: 0; }
+.winner-trophy { font-size: 1rem; }
+
+/* ELO sous le nom */
+.match-player-elo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.elo-track {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.elo-delta-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 12px;
+}
+
+.elo-gain { background: #e6f9ec; color: #2dc653; }
+.elo-loss { background: #fdecea; color: #e63946; }
+
+/* Bloc score central */
+.match-score-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+}
 
 .match-score-badge {
   font-size: 1.3rem;
   font-weight: 900;
   color: #222;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
-/* ===== LIGNE 3 : ELO ===== */
-.match-elo-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  gap: 8px;
-}
-
-.match-elo-block {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-}
-
-.match-elo-block--left  { justify-content: flex-start; }
-.match-elo-block--right { justify-content: flex-end; }
-
-.elo-track {
-  font-size: 0.78rem;
-  color: #888;
-}
-
-.elo-delta-badge {
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
-.elo-gain {
-  background: #e6f9ec;
-  color: #2dc653;
-}
-
-.elo-loss {
-  background: #fdecea;
-  color: #e63946;
-}
-
-/* ===== LIGNE 4 : sets ===== */
+/* ===== LIGNE 3 : sets ===== */
 .match-sets {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 4px;
 }
 
 .set-badge {
-  background: #f0f0f0;
+  background: #eee;
   border-radius: 20px;
   padding: 3px 10px;
   font-size: 0.72rem;
@@ -166,17 +166,4 @@
 .player-list-actions {
   display: flex;
   gap: 6px;
-}
-
-/* Score centré avec trophées */
-.match-score-center {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Placeholder invisible pour aligner le trophée */
-.winner-trophy-empty {
-  display: inline-block;
-  width: 20px;
 }
