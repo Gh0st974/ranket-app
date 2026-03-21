@@ -150,7 +150,7 @@ function _drawEloChart(idA, idB) {
     let elo = startElo;
     const points = [{ elo, label: 'Départ' }];
     playerMatches.forEach(m => {
-      const delta = m.playerAId === playerId ? (m.eloChangeA || 0) : (m.eloChangeB || 0);
+      const delta = m.playerAId === playerId ? (m.deltaA || 0) : (m.deltaB || 0);
       elo += delta;
       const opp = players.find(p => p.id === (m.playerAId === playerId ? m.playerBId : m.playerAId));
       points.push({ elo, label: opp ? Players.fullName(opp) : '?' });
