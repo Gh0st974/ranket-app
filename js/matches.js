@@ -82,7 +82,7 @@ const Matches = {
   _recalcAllElo() {
     const players = Players.getAll();
     players.forEach(p => {
-      p.elo    = CONFIG.ELO_START;
+      p.elo    = CONFIG.ELO_DEFAULT;
       p.wins   = 0;
       p.losses = 0;
       p.streak = 0;
