@@ -8,20 +8,27 @@ const App = {
   // Vue actuellement affichée
   _currentView: 'ranking',
 
-  // Vues classiques — injectées dynamiquement dans #app-main
-  // Stats est géré séparément (section fixe dans le HTML)
-  _views: {
-    ranking: ViewRanking,
-    match:   ViewMatch,
-    history: ViewHistory,
-    players: ViewPlayers,
-  },
-
   /** Initialisation de l'application */
   init() {
     this._registerServiceWorker();
     this._bindNavigation();
     this._navigate('ranking'); // Vue par défaut
+  },
+
+  /**
+   * Résout dynamiquement la vue correspondant au nom donné.
+   * Déclaré en fonction pour éviter les problèmes de référence anticipée.
+   * @param {string} viewName
+   * @returns {object|null}
+   */
+  _resolveView(viewName) {
+    const viewMap = {
+      ranking: typeof ViewRanking !== 'undefined' ? ViewRanking : null,
+      match:   typeof ViewMatch   !== 'undefined' ? ViewMatch   : null,
+      history: typeof ViewHistory !== 'undefined' ? ViewHistory : null,
+      players: typeof ViewPlayers !== 'undefined' ? ViewPlayers : null,
+    };
+    return viewMap[viewName] || null;
   },
 
   /**
@@ -40,8 +47,12 @@ const App = {
     } else {
       // Cas classique : masquer l'onglet stats, injecter la vue dans #app-main
       this._hideStatsTab();
-      const view = this._views[viewName];
-      if (view) view.render();
+      const view = this._resolveView(viewName);
+      if (view) {
+        view.render();
+      } else {
+        console.warn(`⚠️ Vue introuvable : ${viewName}`);
+      }
     }
   },
 
@@ -62,7 +73,7 @@ const App = {
   _bindNavigation() {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const view = btn.dataset.view; // tous les boutons utilisent data-view
+        const view = btn.dataset.view;
         if (view) this._navigate(view);
       });
     });
@@ -76,6 +87,7 @@ const App = {
         .catch(err => console.warn('⚠️ SW non enregistré :', err));
     }
   }
+
 };
 
 // Lancement au chargement du DOM
