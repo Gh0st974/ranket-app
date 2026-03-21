@@ -54,17 +54,17 @@ const ViewHistory = {
   },
 
   /** Construit la liste des matchs filtrés */
-    /** Construit la carte HTML d'un match */
+  /** Construit la carte HTML d'un match */
   _buildCard(match) {
-    const pA   = Players.findById(match.playerAId);
-    const pB   = Players.findById(match.playerBId);
+    const pA = Players.findById(match.playerAId);
+    const pB = Players.findById(match.playerBId);
     if (!pA || !pB) return '';
 
-    const nameA  = Players.fullName(pA);
-    const nameB  = Players.fullName(pB);
-    const aWon   = match.winnerId === match.playerAId;
-    const fmt    = CONFIG.FORMATS[match.format]?.label || match.format;
-    const date   = Matches.formatDate(match.timestamp);
+    const nameA = Players.fullName(pA);
+    const nameB = Players.fullName(pB);
+    const aWon  = match.winnerId === match.playerAId;
+    const fmt   = CONFIG.FORMATS[match.format]?.label || match.format;
+    const date  = Matches.formatDate(match.timestamp);
 
     // ELO avant/après
     const eloABefore = (match.eloAAfter ?? 0) - (match.deltaA ?? 0);
@@ -78,10 +78,11 @@ const ViewHistory = {
     const deltaBCls  = (match.deltaB ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
 
     // Badges sets
-    const setsDetail = match.sets.map((s, i) =>
+    const setsDetail = (match.sets || []).map((s, i) =>
       `<span class="set-badge">Set ${i + 1} : ${s.a} - ${s.b}</span>`
     ).join('');
 
+    // Checkbox si mode sélection actif
     const checkbox = this._selectMode
       ? `<input type="checkbox" class="select-checkbox history-check" data-id="${match.id}">`
       : '';
@@ -96,7 +97,7 @@ const ViewHistory = {
           <div class="match-card-actions">
             ${checkbox}
             <button class="icon-btn icon-btn-edit" data-edit="${match.id}">✏️</button>
-            <button class="icon-btn icon-btn-delete" data-delete="${match.id}">🗑</button>
+            <button class="icon-btn icon-btn-delete" data-delete="${match.id}">🗑️</button>
           </div>
         </div>
 
@@ -119,11 +120,11 @@ const ViewHistory = {
         <div class="match-elo-row">
           <div class="match-elo-block match-elo-block--left">
             <span class="elo-track">${eloABefore} › ${eloAAfter}</span>
-            <span class="elo-delta-badge ${deltaACls}">${deltaASign}${match.deltaA}</span>
+            <span class="elo-delta-badge ${deltaACls}">${deltaASign}${match.deltaA ?? 0}</span>
           </div>
           <div class="match-elo-block match-elo-block--right">
             <span class="elo-track">${eloBBefore} › ${eloBAfter}</span>
-            <span class="elo-delta-badge ${deltaBCls}">${deltaBSign}${match.deltaB}</span>
+            <span class="elo-delta-badge ${deltaBCls}">${deltaBSign}${match.deltaB ?? 0}</span>
           </div>
         </div>
 
@@ -133,6 +134,7 @@ const ViewHistory = {
       </div>
     `;
   },
+
 
 
   /** Attache les événements */
