@@ -49,7 +49,7 @@ const ViewEditMatch = {
             <span>${Players.fullName(playerA)}</span>
             <input type="number" id="edit-sets-a" min="0" max="5"
               value="${match.setsA}" class="score-input" />
-            <span>–</span>
+            <span class="score-separator">–</span>
             <input type="number" id="edit-sets-b" min="0" max="5"
               value="${match.setsB}" class="score-input" />
             <span>${Players.fullName(playerB)}</span>
