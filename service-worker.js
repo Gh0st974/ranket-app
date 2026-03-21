@@ -10,8 +10,13 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './css/reset.css',
   './css/layout.css',
-  './css/components.css',
   './css/responsive.css',
+  './css/components/buttons.css',
+  './css/components/table-ranking.css',
+  './css/components/match-cards.css',
+  './css/components/forms.css',
+  './css/components/ui.css',
+  './css/components/stats.css',
   './js/config.js',
   './js/storage.js',
   './js/elo.js',
@@ -28,6 +33,7 @@ const ASSETS_TO_CACHE = [
   './js/views/view-players.js',
   './js/app.js'
 ];
+
 
 // Installation — mise en cache
 self.addEventListener('install', event => {
