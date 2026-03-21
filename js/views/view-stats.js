@@ -45,29 +45,28 @@ const ViewStats = (() => {
 
   // ─── Rendu principal ───────────────────────────────────────────
   function _renderStats() {
-    const selectA = document.getElementById('stats-player-a');
-    const selectB = document.getElementById('stats-player-b');
-    const container = document.getElementById('stats-content');
-    if (!selectA || !container) return;
+  const selectA = document.getElementById('stats-player-a');
+  const selectB = document.getElementById('stats-player-b');
+  const container = document.getElementById('stats-content');
+  if (!selectA || !container) return;
 
-    const idA = selectA.value;
-    const idB = selectB ? selectB.value : '';
+  const idA = selectA.value;
+  const idB = selectB ? selectB.value : '';
 
-    if (!idA) {
-      container.innerHTML = '<p class="stats-placeholder">Sélectionne un joueur.</p>';
-      return;
-    }
-
-    const statsA = getPlayerStats(idA);
-    if (!statsA) return;
-
-    const statsB = (idB && idB !== idA) ? getPlayerStats(idB) : null;
-
-    container.innerHTML = _buildComparison(statsA, statsB) + _buildEloChart(idA);
-
-    // Dessiner le graphique après injection DOM
-    _drawEloChart(idA);
+  if (!idA) {
+    container.innerHTML = '<p class="stats-placeholder">Sélectionne un joueur.</p>';
+    return;
   }
+
+  const statsA = getPlayerStats(idA);
+  if (!statsA) return;
+
+  const statsB = (idB && idB !== idA) ? getPlayerStats(idB) : null;
+
+  container.innerHTML = _buildComparison(statsA, statsB) + _buildEloChart(idA, idB);
+  _drawEloChart(idA, idB || null);
+}
+
 
   // ─── Tableau comparatif ────────────────────────────────────────
   function _buildComparison(sA, sB) {
@@ -116,65 +115,131 @@ const ViewStats = (() => {
     `;
   }
 
-  // ─── Conteneur graphique ELO ───────────────────────────────────
-  function _buildEloChart(idA) {
-    return `
-      <div class="elo-chart-section">
-        <h3 class="elo-chart-title">Evolution Elo</h3>
-        <canvas id="elo-chart-canvas"></canvas>
-      </div>
-    `;
+  // ─── HTML du bloc graphique ────────────────────────────────────
+function _buildEloChart(idA, idB) {
+  return `
+    <div class="elo-chart-section">
+      <div class="elo-chart-title">📈 Évolution ELO</div>
+      <canvas id="elo-chart-canvas"></canvas>
+    </div>
+  `;
+}
+
+// ─── Dessin du canvas ──────────────────────────────────────────
+function _drawEloChart(idA, idB) {
+  const matches = Storage.getMatches();
+  const players = Storage.getPlayers();
+  const canvas = document.getElementById('elo-chart-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 300;
+  const H = 200;
+  canvas.width = W;
+  canvas.height = H;
+
+  // ─── Reconstruction de la courbe ELO pour un joueur ──────────
+  function buildCurve(playerId) {
+    const player = players.find(p => p.id === playerId);
+    if (!player) return [];
+    const startElo = 1000;
+    const playerMatches = matches
+      .filter(m => m.playerAId === playerId || m.playerBId === playerId)
+      .sort((a, b) => a.timestamp - b.timestamp);
+
+    let elo = startElo;
+    const points = [{ elo, label: 'Départ' }];
+    playerMatches.forEach(m => {
+      const delta = m.playerAId === playerId ? (m.eloChangeA || 0) : (m.eloChangeB || 0);
+      elo += delta;
+      const opp = players.find(p => p.id === (m.playerAId === playerId ? m.playerBId : m.playerAId));
+      points.push({ elo, label: opp ? Players.fullName(opp) : '?' });
+    });
+    return points;
   }
 
-  // ─── Dessin du graphique ELO (canvas natif) ────────────────────
-  function _drawEloChart(idA) {
-    const canvas = document.getElementById('elo-chart-canvas');
-    if (!canvas) return;
+  const curveA = buildCurve(idA);
+  const curveB = idB ? buildCurve(idB) : [];
 
-    const history = getEloHistory(idA);
-    if (history.length < 2) return;
+  const allElos = [...curveA, ...curveB].map(p => p.elo);
+  const minElo = Math.min(...allElos) - 30;
+  const maxElo = Math.max(...allElos) + 30;
 
-    const dpr = window.devicePixelRatio || 1;
-    const W = canvas.offsetWidth;
-    const H = canvas.offsetHeight;
-    canvas.width = W * dpr;
-    canvas.height = H * dpr;
+  const pad = { top: 20, bottom: 30, left: 45, right: 20 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
 
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+  // ─── Utilitaire coordonnées ───────────────────────────────────
+  function toX(i, total) {
+    return pad.left + (i / Math.max(total - 1, 1)) * chartW;
+  }
+  function toY(elo) {
+    return pad.top + chartH - ((elo - minElo) / (maxElo - minElo)) * chartH;
+  }
 
-    const elos = history.map(h => h.elo);
-    const minElo = Math.min(...elos) - 30;
-    const maxElo = Math.max(...elos) + 30;
-    const pad = { top: 30, right: 40, bottom: 20, left: 10 };
-    const chartW = W - pad.left - pad.right;
-    const chartH = H - pad.top - pad.bottom;
-
-    const xOf = i => pad.left + (i / (elos.length - 1)) * chartW;
-    const yOf = v => pad.top + (1 - (v - minElo) / (maxElo - minElo)) * chartH;
-
-    // Ligne
+  // ─── Grille ───────────────────────────────────────────────────
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = '#eee';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (chartH / 4) * i;
     ctx.beginPath();
-    ctx.strokeStyle = '#5b8dee';
-    ctx.lineWidth = 2;
-    elos.forEach((v, i) => i === 0 ? ctx.moveTo(xOf(i), yOf(v)) : ctx.lineTo(xOf(i), yOf(v)));
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+    const val = Math.round(maxElo - ((maxElo - minElo) / 4) * i);
+    ctx.fillStyle = '#999';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(val, pad.left - 4, y + 4);
+  }
+
+  // ─── Fonction dessin courbe ───────────────────────────────────
+  function drawCurve(points, color) {
+    if (points.length < 2) return;
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    points.forEach((p, i) => {
+      const x = toX(i, points.length);
+      const y = toY(p.elo);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
     ctx.stroke();
 
-    // Points + labels premier/dernier
-    elos.forEach((v, i) => {
+    // Points
+    points.forEach((p, i) => {
       ctx.beginPath();
-      ctx.arc(xOf(i), yOf(v), 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#5b8dee';
+      ctx.arc(toX(i, points.length), toY(p.elo), 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = color;
       ctx.fill();
-
-      if (i === 0 || i === elos.length - 1) {
-        ctx.fillStyle = '#333';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = i === 0 ? 'left' : 'right';
-        ctx.fillText(v, xOf(i), yOf(v) - 8);
-      }
     });
   }
+
+  drawCurve(curveA, '#6c3fcf');
+  if (curveB.length > 0) drawCurve(curveB, '#cf3f3f');
+
+  // ─── Légende si 2 joueurs ─────────────────────────────────────
+  if (curveB.length > 0) {
+    const pA = players.find(p => p.id === idA);
+    const pB = players.find(p => p.id === idB);
+    const nameA = pA ? Players.fullName(pA) : 'Joueur A';
+    const nameB = pB ? Players.fullName(pB) : 'Joueur B';
+
+    ctx.font = 'bold 11px sans-serif';
+    ctx.textAlign = 'left';
+
+    ctx.fillStyle = '#6c3fcf';
+    ctx.fillRect(pad.left, H - 14, 12, 4);
+    ctx.fillText(nameA, pad.left + 16, H - 10);
+
+    ctx.fillStyle = '#cf3f3f';
+    ctx.fillRect(pad.left + 120, H - 14, 12, 4);
+    ctx.fillText(nameB, pad.left + 136, H - 10);
+  }
+}
+
 
   return { render };
 })();
