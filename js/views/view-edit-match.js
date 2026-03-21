@@ -77,7 +77,7 @@ const ViewEditMatch = {
     document.getElementById('btn-edit-save')?.addEventListener('click', () => {
       const format = document.getElementById('edit-format').value;
       const setsA  = parseInt(document.getElementById('edit-sets-a').value, 10);
-      const setsB  = parseInt(document.getElementById('edit-sets-b').value', 10);
+      const setsB  = parseInt(document.getElementById('edit-sets-b').value, 10);
       const dateVal = document.getElementById('edit-date').value;
 
       // Validation
