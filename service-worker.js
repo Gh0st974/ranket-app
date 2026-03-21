@@ -63,8 +63,11 @@ self.addEventListener('activate', event => {
 // Fetch — Network First pour JS/CSS, Cache First pour le reste
 self.addEventListener('fetch', event => {
   const url = event.request.url;
-  const isAsset = url.endsWith('.js') || url.endsWith('.css');
 
+  // ✅ Ignorer les requêtes non-HTTP (extensions Chrome, etc.)
+  if (!url.startsWith('http')) return;
+
+  const isAsset = url.endsWith('.js') || url.endsWith('.css');
   if (isAsset) {
     // ✅ Network First — toujours la version fraîche pour le code
     event.respondWith(
