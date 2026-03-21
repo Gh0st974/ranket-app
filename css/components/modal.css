@@ -66,6 +66,9 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  /* Scroll si le contenu déborde (ex: beaucoup de sets) */
+  max-height: 75vh;
+  overflow-y: auto;
 }
 
 /* Noms des joueurs */
@@ -115,7 +118,104 @@
   background: #fff;
 }
 
-/* ===== SCORE ROW ===== */
+/* ===== EN-TÊTE DES COLONNES DE SETS ===== */
+.sets-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  padding: 0 2.4rem 0 0.4rem; /* aligne avec les inputs, compense le bouton ✕ */
+  margin-bottom: 0.2rem;
+}
+
+.sets-player-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== LISTE DES SETS ===== */
+#edit-sets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+/* ===== LIGNE D'UN SET ===== */
+.set-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem;
+}
+
+/* Input score dans un set */
+.set-row .score-input {
+  width: 100%;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 0.35rem 0.2rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-primary, #e63946);
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.set-row .score-input:focus {
+  border-color: var(--color-primary, #e63946);
+  background: #fff;
+}
+
+/* Séparateur – entre les deux scores */
+.set-row .score-separator {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #bbb;
+  text-align: center;
+}
+
+/* Bouton supprimer un set */
+.btn-remove-set {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.2rem 0.3rem;
+  border-radius: 6px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-remove-set:hover {
+  color: #e63946;
+  background: #ffeaea;
+}
+
+/* ===== BOUTON AJOUTER UN SET ===== */
+.btn-sm {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 8px;
+  margin-top: 0.15rem;
+  align-self: flex-start;
+}
+
+/* ===== SCORE ROW (ancienne structure, conservée) ===== */
 .edit-score-row {
   display: flex;
   align-items: center;
@@ -165,4 +265,3 @@
   padding: 0.9rem 1.4rem 1.2rem;
   border-top: 1px solid #f0f0f0;
 }
-
