@@ -3,8 +3,8 @@
 
 const ViewHistory = {
 
-  _filterPlayerId: '',   // Filtre joueur actif
-  _sortOrder: 'desc',    // Tri : 'desc' = plus récent en premier
+  _filterPlayerId: '',
+  _sortOrder: 'desc',
   _displayCount: CONFIG.ITEMS_PER_PAGE,
   _selectMode: false,
 
@@ -53,7 +53,41 @@ const ViewHistory = {
     `;
   },
 
-  /** Construit la liste des matchs filtrés */
+  /** Construit la liste des matchs filtrés/triés */
+  _buildList() {
+    let matches = Matches.getAll();
+
+    // Filtre par joueur
+    if (this._filterPlayerId) {
+      matches = matches.filter(m =>
+        m.playerAId === this._filterPlayerId ||
+        m.playerBId === this._filterPlayerId
+      );
+    }
+
+    // Tri
+    matches = matches.sort((a, b) =>
+      this._sortOrder === 'desc'
+        ? b.timestamp - a.timestamp
+        : a.timestamp - b.timestamp
+    );
+
+    if (matches.length === 0) {
+      return `<p class="empty-state">Aucun match enregistré.</p>`;
+    }
+
+    const visible = matches.slice(0, this._displayCount);
+    const hasMore = matches.length > this._displayCount;
+
+    return `
+      ${visible.map(m => this._buildCard(m)).join('')}
+      ${hasMore ? `
+        <button class="btn btn-secondary" id="btn-show-more-history">
+          Afficher plus (${matches.length - this._displayCount} restants)
+        </button>` : ''}
+    `;
+  },
+
   /** Construit la carte HTML d'un match */
   _buildCard(match) {
     const pA = Players.findById(match.playerAId);
@@ -135,8 +169,6 @@ const ViewHistory = {
     `;
   },
 
-
-
   /** Attache les événements */
   _bindEvents() {
     // Filtre joueur
@@ -181,7 +213,7 @@ const ViewHistory = {
       }
     });
 
-    // Délégation : suppression d'un match
+    // Délégation : suppression / afficher plus
     document.getElementById('history-list-container')?.addEventListener('click', (e) => {
       const deleteId = e.target.closest('[data-delete]')?.dataset.delete;
       if (deleteId) {
@@ -206,4 +238,5 @@ const ViewHistory = {
     const container = document.getElementById('history-list-container');
     if (container) container.innerHTML = this._buildList();
   }
+
 };
