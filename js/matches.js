@@ -86,6 +86,7 @@ const Matches = {
       p.wins   = 0;
       p.losses = 0;
       p.streak = 0;
+      p.matchesPlayed = 0;
     });
     Storage.savePlayers(players);
 
