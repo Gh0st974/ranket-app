@@ -917,9 +917,12 @@
 .set-row {
   display: flex;
   align-items: center;
+  justify-content: center;  /* ← centrage horizontal */
   gap: 10px;
   margin-bottom: 8px;
+  width: 100%;              /* ← prend toute la largeur */
 }
+
 
 .set-label {
   width: 50px;
