@@ -1,9 +1,9 @@
 // 📄 Fichier : service-worker.js
 // 🎯 Rôle : Cache des ressources pour le mode PWA offline
 
-const CACHE_NAME = 'ranket-v1';
+// ⚠️ Incrémenter cette version à chaque déploiement
+const CACHE_NAME = 'ranket-v6';
 
-// ⚠️ Liste uniquement les fichiers qui existent réellement
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -34,13 +34,12 @@ const ASSETS_TO_CACHE = [
   './js/app.js'
 ];
 
-
 // Installation — mise en cache
 self.addEventListener('install', event => {
+  // Force l'activation immédiate sans attendre la fermeture des onglets
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      // On ajoute les fichiers un par un pour éviter qu'un seul
-      // fichier manquant ne fasse tout échouer
       return Promise.allSettled(
         ASSETS_TO_CACHE.map(url => cache.add(url).catch(err => {
           console.warn('⚠️ Impossible de cacher :', url, err);
@@ -50,22 +49,39 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activation — nettoyage des anciens caches
+// Activation — nettoyage des anciens caches + prise de contrôle immédiate
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       )
-    )
+    ).then(() => self.clients.claim()) // ← prend le contrôle immédiatement
   );
 });
 
-// Fetch — répondre depuis le cache si disponible
+// Fetch — Network First pour JS/CSS, Cache First pour le reste
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      return cached || fetch(event.request);
-    })
-  );
+  const url = event.request.url;
+  const isAsset = url.endsWith('.js') || url.endsWith('.css');
+
+  if (isAsset) {
+    // ✅ Network First — toujours la version fraîche pour le code
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request)) // fallback offline
+    );
+  } else {
+    // Cache First pour images, fonts, etc.
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        return cached || fetch(event.request);
+      })
+    );
+  }
 });
