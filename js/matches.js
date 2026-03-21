@@ -135,13 +135,15 @@ const Matches = {
   },
 
   _countSets(sets) {
-    let setsA = 0, setsB = 0;
-    sets.forEach(s => {
-      if (s.a > s.b) setsA++;
-      else if (s.b > s.a) setsB++;
-    });
-    return { setsA, setsB };
-  },
+  let setsA = 0, setsB = 0;
+  sets.forEach(s => {
+    const a = Number(s.a);
+    const b = Number(s.b);
+    if (a > b) setsA++;
+    else if (b > a) setsB++;
+  });
+  return { setsA, setsB };
+},
 
   filter({ playerId = null, order = 'desc' } = {}) {
     let matches = this.getAll();
