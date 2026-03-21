@@ -167,3 +167,16 @@
   display: flex;
   gap: 6px;
 }
+
+/* Score centré avec trophées */
+.match-score-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Placeholder invisible pour aligner le trophée */
+.winner-trophy-empty {
+  display: inline-block;
+  width: 20px;
+}

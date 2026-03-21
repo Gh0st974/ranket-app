@@ -36,20 +36,22 @@ const Matches = {
     
     // Création de l'objet match
     const match = {
-      id:        this.generateId(),
-      timestamp: Date.now(),
-      format,
-      playerAId,
-      playerBId,
-      sets,
-      setsA,
-      setsB,
-      winnerId,
-      eloA:      playerA.elo,  // ELO avant le match
-      eloB:      playerB.elo,
-      deltaA:    eloResult.deltaA,
-      deltaB:    eloResult.deltaB
-    };
+    id:        this.generateId(),
+    timestamp: Date.now(),
+    format,
+    playerAId,
+    playerBId,
+    sets,
+    setsA,
+    setsB,
+    winnerId,
+    eloA:      playerA.elo,              // ELO avant le match
+    eloB:      playerB.elo,
+    deltaA:    eloResult.deltaA,
+    deltaB:    eloResult.deltaB,
+    eloAAfter: playerA.elo + eloResult.deltaA,  // ✅ ELO après le match
+    eloBAfter: playerB.elo + eloResult.deltaB   // ✅ ELO après le match
+  };
 
     // Sauvegarde
     const matches = this.getAll();
