@@ -906,3 +906,76 @@
   height: 200px;
   display: block;
 }
+
+/* ── Sets ─────────────────────────────────────────── */
+.sets-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.set-label {
+  width: 50px;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  flex-shrink: 0;
+}
+
+.set-input {
+  width: 60px;
+  text-align: center;
+  padding: 8px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.set-separator {
+  font-size: 1.1rem;
+  color: var(--color-text-light);
+  flex-shrink: 0;
+}
+
+.set-delete-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.set-delete-btn:hover {
+  background: var(--color-primary-dark, #c0392b);
+}
+
+.btn-add-set {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.btn-add-set:hover {
+  background: #e0e0e0;
+}
