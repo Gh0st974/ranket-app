@@ -17,7 +17,6 @@ const App = {
 
   /**
    * Résout dynamiquement la vue correspondant au nom donné.
-   * Déclaré en fonction pour éviter les problèmes de référence anticipée.
    * @param {string} viewName
    * @returns {object|null}
    */
@@ -42,10 +41,8 @@ const App = {
     UI.setActiveNav(viewName);
 
     if (viewName === 'stats') {
-      // Cas spécial : onglet Stats — section HTML fixe
       this._showStatsTab();
     } else {
-      // Cas classique : masquer l'onglet stats, injecter la vue dans #app-main
       this._hideStatsTab();
       const view = this._resolveView(viewName);
       if (view) {
@@ -54,6 +51,11 @@ const App = {
         console.warn(`⚠️ Vue introuvable : ${viewName}`);
       }
     }
+  },
+
+  /** Rafraîchit la vue actuellement affichée */
+  refreshCurrentView() {
+    this._navigate(this._currentView);
   },
 
   /** Affiche la section Stats et l'initialise */

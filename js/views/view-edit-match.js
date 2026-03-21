@@ -46,19 +46,16 @@ const ViewEditMatch = {
 
       <div class="em-body">
 
-        <!-- DATE -->
         <div class="em-date-block">
           <div class="em-date-label">Date &amp; heure</div>
           <input type="datetime-local" id="edit-datetime" class="em-date-input" value="${dateStr}">
         </div>
 
-        <!-- JOUEURS -->
         <div class="em-players-row">
           <span class="em-player-name">${nameA}</span>
           <span class="em-player-name em-player-right">${nameB}</span>
         </div>
 
-        <!-- FORMAT -->
         <div class="em-format-row">
           <select id="edit-format" class="em-format-select">
             <option value="best1" ${this._format==='best1'?'selected':''}>Format : 1 set gagnant</option>
@@ -67,15 +64,12 @@ const ViewEditMatch = {
           </select>
         </div>
 
-        <!-- SETS -->
         <div id="edit-sets-list" class="em-sets-list">
           ${this._buildSetsHTML()}
         </div>
 
-        <!-- BOUTON AJOUTER -->
         <button class="btn btn-outline btn-sm em-add-set-btn" id="btn-add-set">+ Ajouter un set</button>
 
-        <!-- SCORE FINAL -->
         <div class="em-score-final">
           <div class="em-score-number">${scoreA}</div>
           <div class="em-score-badge">SCORE</div>
@@ -84,7 +78,6 @@ const ViewEditMatch = {
 
       </div>
 
-      <!-- FOOTER -->
       <div class="em-footer">
         <span class="em-footer-title">✏️ Modifier le match</span>
         <div class="em-footer-actions">
@@ -171,16 +164,6 @@ const ViewEditMatch = {
     const scoreA = this._sets.filter(s => Number(s.a) > Number(s.b)).length;
     const scoreB = this._sets.filter(s => Number(s.b) > Number(s.a)).length;
 
-    const updated = {
-      ...match,
-      format:    this._format,
-      sets:      this._sets.map(s => ({ a: Number(s.a), b: Number(s.b) })),
-      setsA:     scoreA,
-      setsB:     scoreB,
-      winnerId:  scoreA > scoreB ? match.playerAId : match.playerBId,
-      timestamp: new Date(datetime).getTime()
-    };
-
     Matches.update(match.id, {
       format:    this._format,
       sets:      this._sets.map(s => ({ a: Number(s.a), b: Number(s.b) })),
@@ -189,8 +172,12 @@ const ViewEditMatch = {
       winnerId:  scoreA > scoreB ? match.playerAId : match.playerBId,
       timestamp: new Date(datetime).getTime()
     });
+
     UI.closeModal();
     UI.toast('Match mis à jour ✅');
-    ViewHistory.render();
+
+    // Rafraîchit la vue active quelle qu'elle soit
+    App.refreshCurrentView();
   }
+
 };
