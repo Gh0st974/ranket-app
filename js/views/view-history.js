@@ -8,7 +8,6 @@ const ViewHistory = {
   _displayCount: CONFIG.ITEMS_PER_PAGE,
   _selectMode: false,
 
-  /** Point d'entrée */
   render() {
     this._filterPlayerId = '';
     this._sortOrder      = 'desc';
@@ -18,13 +17,11 @@ const ViewHistory = {
     this._bindEvents();
   },
 
-  /** Construit le HTML complet de la vue */
   _buildHTML() {
     const players = Players.getAll();
     return `
       <h2 class="view-title">Historique des matchs</h2>
 
-      <!-- Filtres & Tri -->
       <div class="history-filters">
         <select id="filter-player">
           <option value="">👤 Tous les joueurs</option>
@@ -40,24 +37,20 @@ const ViewHistory = {
         </select>
       </div>
 
-      <!-- Toolbar -->
       <div class="toolbar">
         <button class="btn btn-secondary" id="btn-select-history">✔ Sélectionner</button>
         <button class="btn btn-secondary" id="btn-clear-history">✖ Tout effacer</button>
       </div>
 
-      <!-- Liste des matchs -->
       <div id="history-list-container">
         ${this._buildList()}
       </div>
     `;
   },
 
-  /** Construit la liste des matchs filtrés/triés */
   _buildList() {
     let matches = Matches.getAll();
 
-    // Filtre par joueur
     if (this._filterPlayerId) {
       matches = matches.filter(m =>
         m.playerAId === this._filterPlayerId ||
@@ -65,7 +58,6 @@ const ViewHistory = {
       );
     }
 
-    // Tri
     matches = matches.sort((a, b) =>
       this._sortOrder === 'desc'
         ? b.timestamp - a.timestamp
@@ -88,118 +80,101 @@ const ViewHistory = {
     `;
   },
 
-  /** Construit la carte HTML d'un match */
-_buildCard(match) {
-  const pA = Players.findById(match.playerAId);
-  const pB = Players.findById(match.playerBId);
-  if (!pA || !pB) return '';
+  _buildCard(match) {
+    const pA = Players.findById(match.playerAId);
+    const pB = Players.findById(match.playerBId);
+    if (!pA || !pB) return '';
 
-  const nameA = Players.fullName(pA);
-  const nameB = Players.fullName(pB);
-  const aWon  = match.winnerId === match.playerAId;
-  const fmt   = CONFIG.FORMATS[match.format]?.label || match.format;
-  const date  = Matches.formatDate(match.timestamp);
+    const nameA = Players.fullName(pA);
+    const nameB = Players.fullName(pB);
+    const aWon  = match.winnerId === match.playerAId;
+    const fmt   = CONFIG.FORMATS[match.format]?.label || match.format;
+    const date  = Matches.formatDate(match.timestamp);
 
-  // ELO
-  const eloABefore = match.eloA ?? '—';
-  const eloBBefore = match.eloB ?? '—';
-  const eloAAfter  = match.eloAAfter ?? (match.eloA != null ? match.eloA + (match.deltaA ?? 0) : '—');
-  const eloBAfter  = match.eloBAfter ?? (match.eloB != null ? match.eloB + (match.deltaB ?? 0) : '—');
-  const deltaASign = (match.deltaA ?? 0) >= 0 ? '+' : '';
-  const deltaBSign = (match.deltaB ?? 0) >= 0 ? '+' : '';
-  const deltaACls  = (match.deltaA ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
-  const deltaBCls  = (match.deltaB ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
+    const eloABefore = match.eloA ?? '—';
+    const eloBBefore = match.eloB ?? '—';
+    const eloAAfter  = match.eloAAfter ?? (match.eloA != null ? match.eloA + (match.deltaA ?? 0) : '—');
+    const eloBAfter  = match.eloBAfter ?? (match.eloB != null ? match.eloB + (match.deltaB ?? 0) : '—');
+    const deltaASign = (match.deltaA ?? 0) >= 0 ? '+' : '';
+    const deltaBSign = (match.deltaB ?? 0) >= 0 ? '+' : '';
+    const deltaACls  = (match.deltaA ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
+    const deltaBCls  = (match.deltaB ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
 
-  // Sets
-  const setsDetail = (match.sets || []).map((s, i) =>
-    `<span class="set-badge">Set ${i + 1} : ${s.a} - ${s.b}</span>`
-  ).join('');
+    const setsDetail = (match.sets || []).map((s, i) =>
+      `<span class="set-badge">Set ${i + 1} : ${s.a} - ${s.b}</span>`
+    ).join('');
 
-  // Checkbox si mode sélection
-  const checkbox = this._selectMode
-    ? `<input type="checkbox" class="select-checkbox history-check" data-id="${match.id}">`
-    : '';
+    const checkbox = this._selectMode
+      ? `<input type="checkbox" class="select-checkbox history-check" data-id="${match.id}">`
+      : '';
 
-  return `
-    <div class="match-card" data-id="${match.id}">
+    return `
+      <div class="match-card" data-id="${match.id}">
 
-      <!-- Ligne 1 : Date | Format | Actions -->
-      <div class="match-card-header">
-        <span class="match-date">📅 ${date}</span>
-        <span class="match-format-badge">Format : ${fmt}</span>
-        <div class="match-actions">
-          ${checkbox}
-          <button class="icon-btn icon-btn-edit"   data-edit="${match.id}">✏️</button>
-          <button class="icon-btn icon-btn-delete"  data-delete="${match.id}">🗑️</button>
-        </div>
-      </div>
-
-      <!-- Ligne 2 : Joueur A | Score | Joueur B -->
-      <div class="match-players">
-
-        <!-- Joueur A (gauche) -->
-        <div class="match-player--left">
-          <div class="match-player-nameline">
-            ${aWon ? '<span class="winner-trophy">🏆</span>' : ''}
-            <span class="match-player-name ${aWon ? 'winner' : ''}">${nameA}</span>
-          </div>
-          <div class="match-player-elo">
-            <span class="elo-track">${eloABefore} › ${eloAAfter}</span>
-            <span class="elo-delta-badge ${deltaACls}">${deltaASign}${match.deltaA ?? 0}</span>
+        <div class="match-card-header">
+          <span class="match-date">📅 ${date}</span>
+          <span class="match-format-badge">Format : ${fmt}</span>
+          <div class="match-actions">
+            ${checkbox}
+            <button class="icon-btn icon-btn-edit"  data-edit="${match.id}">✏️</button>
+            <button class="icon-btn icon-btn-delete" data-delete="${match.id}">🗑️</button>
           </div>
         </div>
 
-        <!-- Score central -->
-        <div class="match-score-center">
-          <span class="match-score-badge">${match.setsA} - ${match.setsB}</span>
+        <div class="match-players">
+
+          <div class="match-player--left">
+            <div class="match-player-nameline">
+              ${aWon ? '<span class="winner-trophy">🏆</span>' : ''}
+              <span class="match-player-name ${aWon ? 'winner' : ''}">${nameA}</span>
+            </div>
+            <div class="match-player-elo">
+              <span class="elo-track">${eloABefore} › ${eloAAfter}</span>
+              <span class="elo-delta-badge ${deltaACls}">${deltaASign}${match.deltaA ?? 0}</span>
+            </div>
+          </div>
+
+          <div class="match-score-center">
+            <span class="match-score-badge">${match.setsA} - ${match.setsB}</span>
+          </div>
+
+          <div class="match-player--right">
+            <div class="match-player-nameline">
+              <span class="match-player-name ${!aWon ? 'winner' : ''}">${nameB}</span>
+              ${!aWon ? '<span class="winner-trophy">🏆</span>' : ''}
+            </div>
+            <div class="match-player-elo">
+              <span class="elo-delta-badge ${deltaBCls}">${deltaBSign}${match.deltaB ?? 0}</span>
+              <span class="elo-track">${eloBBefore} › ${eloBAfter}</span>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Joueur B (droite) -->
-        <div class="match-player--right">
-          <div class="match-player-nameline">
-            <span class="match-player-name ${!aWon ? 'winner' : ''}">${nameB}</span>
-            ${!aWon ? '<span class="winner-trophy">🏆</span>' : ''}
-          </div>
-          <div class="match-player-elo">
-            <span class="elo-delta-badge ${deltaBCls}">${deltaBSign}${match.deltaB ?? 0}</span>
-            <span class="elo-track">${eloBBefore} › ${eloBAfter}</span>
-          </div>
-        </div>
+        <div class="match-sets">${setsDetail}</div>
 
       </div>
+    `;
+  },
 
-      <!-- Ligne 3 : Sets -->
-      <div class="match-sets">${setsDetail}</div>
-
-    </div>
-  `;
-},
-
-
-
-  /** Attache les événements */
   _bindEvents() {
-    // Filtre joueur
     document.getElementById('filter-player')?.addEventListener('change', (e) => {
       this._filterPlayerId = e.target.value;
       this._displayCount   = CONFIG.ITEMS_PER_PAGE;
       this._refreshList();
     });
 
-    // Tri date
     document.getElementById('filter-sort')?.addEventListener('change', (e) => {
       this._sortOrder    = e.target.value;
       this._displayCount = CONFIG.ITEMS_PER_PAGE;
       this._refreshList();
     });
 
-    // Mode sélection
     document.getElementById('btn-select-history')?.addEventListener('click', () => {
       this._selectMode = !this._selectMode;
       this._refreshList();
     });
 
-    // Tout effacer / supprimer sélection
     document.getElementById('btn-clear-history')?.addEventListener('click', () => {
       if (this._selectMode) {
         const checked = [...document.querySelectorAll('.history-check:checked')]
@@ -221,8 +196,15 @@ _buildCard(match) {
       }
     });
 
-    // Délégation : suppression / afficher plus
     document.getElementById('history-list-container')?.addEventListener('click', (e) => {
+
+      // Éditer un match
+      const editId = e.target.closest('[data-edit]')?.dataset.edit;
+      if (editId) {
+        ViewEditMatch.open(editId);
+      }
+
+      // Supprimer un match
       const deleteId = e.target.closest('[data-delete]')?.dataset.delete;
       if (deleteId) {
         UI.confirm(
@@ -241,7 +223,6 @@ _buildCard(match) {
     });
   },
 
-  /** Rafraîchit uniquement la liste */
   _refreshList() {
     const container = document.getElementById('history-list-container');
     if (container) container.innerHTML = this._buildList();

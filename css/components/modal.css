@@ -1,0 +1,26 @@
+/* 📄 Fichier : /css/components/modal.css
+   🎯 Rôle : Styles du modal générique et du modal d'édition */
+
+.edit-players-label {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.edit-score-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.score-input {
+  width: 3.5rem;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 0.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
