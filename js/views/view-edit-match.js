@@ -181,7 +181,14 @@ const ViewEditMatch = {
       timestamp: new Date(datetime).getTime()
     };
 
-    Matches.update(updated);
+    Matches.update(match.id, {
+      format:    this._format,
+      sets:      this._sets.map(s => ({ a: Number(s.a), b: Number(s.b) })),
+      setsA:     scoreA,
+      setsB:     scoreB,
+      winnerId:  scoreA > scoreB ? match.playerAId : match.playerBId,
+      timestamp: new Date(datetime).getTime()
+    });
     UI.closeModal();
     UI.toast('Match mis à jour ✅');
     ViewHistory.render();
