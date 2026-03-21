@@ -44,18 +44,19 @@
 
 /* ===== LIGNE 2 : joueurs + score ===== */
 .match-players {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* ← gauche | score | droite */
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   margin-bottom: 6px;
+  min-height: 42px;
 }
 
 .match-player {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
-  flex: 1;
+  min-width: 0;
 }
 
 .match-player--left  { justify-content: flex-start; }
@@ -65,11 +66,15 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: #333;
+  word-break: break-word;   /* ← coupe si vraiment trop long */
+  overflow-wrap: break-word;
+  white-space: normal;      /* ← autorise le passage à la ligne */
+  max-width: 100%;
 }
 
 .match-player-name.winner { color: #e63946; }
 
-.winner-trophy { font-size: 1rem; }
+.winner-trophy { font-size: 1rem; flex-shrink: 0; }
 
 .match-score-badge {
   font-size: 1.3rem;
