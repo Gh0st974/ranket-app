@@ -1,50 +1,143 @@
 /* 📄 Fichier : /css/components/match-cards.css
    🎯 Rôle : Styles des cartes de match dans l'historique */
 
-/* ===== CARTE MATCH ===== */
+/* ===== CARTE ===== */
 .match-card {
   background: white;
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
+/* ===== LIGNE 1 : en-tête ===== */
 .match-card-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.match-date {
+  font-size: 0.78rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.match-format-badge {
+  background: #eee;
+  color: #555;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.match-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== LIGNE 2 : joueurs + score ===== */
+.match-players {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   margin-bottom: 6px;
 }
 
-/* ===== RÉSULTAT ELO ===== */
-.elo-change  { font-weight: 600; }
-.elo-gain    { color: #2dc653; }
-.elo-loss    { color: #e63946; }
+.match-player {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
 
-/* ===== SETS ===== */
+.match-player--left  { justify-content: flex-start; }
+.match-player--right { justify-content: flex-end; flex-direction: row-reverse; }
+
+.match-player-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.match-player-name.winner { color: #e63946; }
+
+.winner-trophy { font-size: 1rem; }
+
+.match-score-badge {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #222;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ===== LIGNE 3 : ELO ===== */
+.match-elo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.match-elo-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.match-elo-block--left  { justify-content: flex-start; }
+.match-elo-block--right { justify-content: flex-end; }
+
+.elo-track {
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.elo-delta-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.elo-gain {
+  background: #e6f9ec;
+  color: #2dc653;
+}
+
+.elo-loss {
+  background: #fdecea;
+  color: #e63946;
+}
+
+/* ===== LIGNE 4 : sets ===== */
 .match-sets {
-  margin-top: 8px;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .set-badge {
   background: #f0f0f0;
-  border-radius: 8px;
-  padding: 2px 8px;
+  border-radius: 20px;
+  padding: 3px 10px;
   font-size: 0.72rem;
   color: #444;
+  font-weight: 600;
 }
 
-/* ===== ACTIONS CARTE ===== */
-.match-card-actions {
-  display: flex;
-  gap: 6px;
-}
-
-/* ===== LISTE JOUEURS ===== */
+/* ===== LISTE JOUEURS (vue joueurs) ===== */
 .player-list-item {
   display: flex;
   justify-content: space-between;

@@ -54,45 +54,32 @@ const ViewHistory = {
   },
 
   /** Construit la liste des matchs filtrés */
-  _buildList() {
-    const matches = Matches.filter({
-      playerId: this._filterPlayerId || null,
-      order:    this._sortOrder
-    });
-
-    if (matches.length === 0) {
-      return '<div class="empty-state">📋 Aucun match enregistré</div>';
-    }
-
-    const visible = matches.slice(0, this._displayCount);
-    const hasMore = matches.length > this._displayCount;
-
-    const cards = visible.map(m => this._buildCard(m)).join('');
-    const showMore = hasMore ? `
-      <div class="show-more-btn">
-        <button id="btn-show-more-history">⌄ Afficher plus</button>
-      </div>` : '';
-
-    return cards + showMore;
-  },
-
-  /** Construit la carte HTML d'un match */
+    /** Construit la carte HTML d'un match */
   _buildCard(match) {
-    const pA      = Players.findById(match.playerAId);
-    const pB      = Players.findById(match.playerBId);
+    const pA   = Players.findById(match.playerAId);
+    const pB   = Players.findById(match.playerBId);
     if (!pA || !pB) return '';
 
-    const nameA   = Players.fullName(pA);
-    const nameB   = Players.fullName(pB);
-    const aWon    = match.winnerId === match.playerAId;
-    const fmt     = CONFIG.FORMATS[match.format]?.label || match.format;
-    const date    = Matches.formatDate(match.timestamp);
+    const nameA  = Players.fullName(pA);
+    const nameB  = Players.fullName(pB);
+    const aWon   = match.winnerId === match.playerAId;
+    const fmt    = CONFIG.FORMATS[match.format]?.label || match.format;
+    const date   = Matches.formatDate(match.timestamp);
 
-    const deltaASign = match.deltaA >= 0 ? '+' : '';
-    const deltaBSign = match.deltaB >= 0 ? '+' : '';
+    // ELO avant/après
+    const eloABefore = (match.eloAAfter ?? 0) - (match.deltaA ?? 0);
+    const eloBBefore = (match.eloBAfter ?? 0) - (match.deltaB ?? 0);
+    const eloAAfter  = match.eloAAfter ?? '—';
+    const eloBAfter  = match.eloBAfter ?? '—';
 
+    const deltaASign = (match.deltaA ?? 0) >= 0 ? '+' : '';
+    const deltaBSign = (match.deltaB ?? 0) >= 0 ? '+' : '';
+    const deltaACls  = (match.deltaA ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
+    const deltaBCls  = (match.deltaB ?? 0) >= 0 ? 'elo-gain' : 'elo-loss';
+
+    // Badges sets
     const setsDetail = match.sets.map((s, i) =>
-      `<span class="set-badge">Set ${i+1} : ${s.a}—${s.b}</span>`
+      `<span class="set-badge">Set ${i + 1} : ${s.a} - ${s.b}</span>`
     ).join('');
 
     const checkbox = this._selectMode
@@ -101,35 +88,52 @@ const ViewHistory = {
 
     return `
       <div class="match-card" data-id="${match.id}">
+
+        <!-- Ligne 1 : date | format | actions -->
         <div class="match-card-header">
-          <span class="match-date">${date}</span>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="match-format-badge">${fmt}</span>
+          <span class="match-date">📅 ${date}</span>
+          <span class="match-format-badge">Format : ${fmt}</span>
+          <div class="match-card-actions">
             ${checkbox}
+            <button class="icon-btn icon-btn-edit" data-edit="${match.id}">✏️</button>
+            <button class="icon-btn icon-btn-delete" data-delete="${match.id}">🗑</button>
           </div>
         </div>
+
+        <!-- Ligne 2 : Joueur A | score | Joueur B -->
         <div class="match-players">
-          <div class="match-player">
+          <div class="match-player match-player--left">
+            ${aWon ? '<span class="winner-trophy">🏆</span>' : ''}
             <span class="match-player-name ${aWon ? 'winner' : ''}">${nameA}</span>
-            <span class="match-elo-delta ${match.deltaA >= 0 ? 'elo-gain' : 'elo-loss'}">
-              ${deltaASign}${match.deltaA} pts ELO
-            </span>
           </div>
-          <span class="match-score-badge">${match.setsA} — ${match.setsB}</span>
-          <div class="match-player" style="text-align:right;">
+
+          <span class="match-score-badge">${match.setsA} - ${match.setsB}</span>
+
+          <div class="match-player match-player--right">
+            ${!aWon ? '<span class="winner-trophy">🏆</span>' : ''}
             <span class="match-player-name ${!aWon ? 'winner' : ''}">${nameB}</span>
-            <span class="match-elo-delta ${match.deltaB >= 0 ? 'elo-gain' : 'elo-loss'}">
-              ${deltaBSign}${match.deltaB} pts ELO
-            </span>
           </div>
         </div>
-        <div class="match-sets">${setsDetail}</div>
-        <div class="match-card-actions" style="margin-top:8px; justify-content:flex-end; display:flex; gap:6px;">
-          <button class="icon-btn icon-btn-delete" data-delete="${match.id}">🗑</button>
+
+        <!-- Ligne 3 : ELO avant > après + delta -->
+        <div class="match-elo-row">
+          <div class="match-elo-block match-elo-block--left">
+            <span class="elo-track">${eloABefore} › ${eloAAfter}</span>
+            <span class="elo-delta-badge ${deltaACls}">${deltaASign}${match.deltaA}</span>
+          </div>
+          <div class="match-elo-block match-elo-block--right">
+            <span class="elo-track">${eloBBefore} › ${eloBAfter}</span>
+            <span class="elo-delta-badge ${deltaBCls}">${deltaBSign}${match.deltaB}</span>
+          </div>
         </div>
+
+        <!-- Ligne 4 : Sets -->
+        <div class="match-sets">${setsDetail}</div>
+
       </div>
     `;
   },
+
 
   /** Attache les événements */
   _bindEvents() {
