@@ -8,8 +8,8 @@ const ViewEditMatch = {
     const match = Matches.getById(matchId);
     if (!match) { UI.toast('Match introuvable.'); return; }
 
-    const playerA = Players.getById(match.playerAId);
-    const playerB = Players.getById(match.playerBId);
+    const playerA = Players.findById(match.playerAId);
+    const playerB = Players.findById(match.playerBId);
     if (!playerA || !playerB) { UI.toast('Joueur introuvable.'); return; }
 
     UI.openModal(this._buildHTML(match, playerA, playerB));
