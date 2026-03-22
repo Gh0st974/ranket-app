@@ -30,7 +30,7 @@ const CONFIG = {
       multFort   : 0.6
     },
     TIGHT: {
-      multFaible : 1.2,
+      multFaible : 0.6,
       multFort   : 0.8
     },
     NEUTRAL: {
