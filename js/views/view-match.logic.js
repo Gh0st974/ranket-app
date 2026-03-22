@@ -22,7 +22,7 @@ const ViewMatchLogic = {
 
     const eloA  = pA.elo ?? CONFIG.DEFAULT_ELO;
     const eloB  = pB.elo ?? CONFIG.DEFAULT_ELO;
-    const probaA = Math.round(EloEngine.winProbability(eloA, eloB) * 100);
+    const probaA = Elo.winProbability(eloA, eloB);
     const probaB = 100 - probaA;
 
     const nameA = Players.fullName(pA);
