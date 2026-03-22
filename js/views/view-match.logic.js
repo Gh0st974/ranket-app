@@ -29,9 +29,9 @@ const ViewMatchLogic = {
     const nameB = Players.fullName(pB);
 
     document.getElementById('proba-display').innerHTML =
-      `<span class="proba-highlight" style="color:var(--color-primary)">${nameA} : ${probaA}%</span>
+      `<span class="proba-highlight" style="color:var(--color-primary)">${probaA}%</span>
        &nbsp;probabilité de victoire&nbsp;
-       <span class="proba-highlight" style="color:var(--color-primary)">${nameB} : ${probaB}%</span>`;
+       <span class="proba-highlight" style="color:var(--color-primary)">${probaB}%</span>`;
   },
 
   /** Met à jour le score final affiché */
