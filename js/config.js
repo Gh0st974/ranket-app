@@ -14,17 +14,30 @@ const CONFIG = {
     { maxElo: Infinity, k: 20 }
   ],
 
-  // Multiplicateur de combativité basé sur la performance relative
+  // Multiplicateurs de combativité asymétriques
+  // Appliqués selon le rôle ELO (fort / faible) et la performance du joueur_faible
   // performance = écart_attendu - écart_réel
-  //   → performance élevée : le faible a résisté au-delà des attentes → bonus
-  //   → performance faible ou négative : le fort a dominé → malus
-  // Les paliers sont triés du plus grand au plus petit (ordre décroissant)
-  ELO_COMBATIVITY_BRACKETS: [
-    { minPerf:  4, multiplierWinner: 1.4, multiplierLoser: 1.3 }, // Résistance exceptionnelle
-    { minPerf:  2, multiplierWinner: 1.2, multiplierLoser: 1.1 }, // Légèrement au-dessus des attentes
-    { minPerf: -2, multiplierWinner: 1.0, multiplierLoser: 1.0 }, // Dans les clous
-    { minPerf: -Infinity, multiplierWinner: 0.8, multiplierLoser: 0.8 } // Écrasement
-  ],
+  //   → performance > 0  : le faible a mieux résisté qu'attendu
+  //   → performance <= 0 : le fort a dominé au-delà des attentes
+  //
+  // CAS 1 — Upset        : le joueur_faible gagne
+  // CAS 2 — Match serré  : le joueur_fort gagne ET performance ≥ 2
+  // CAS 3 — Dans les clous : -2 ≤ performance < 2   → neutre
+  // CAS 4 — Écrasement   : performance < -2          → neutre
+  ELO_COMBATIVITY: {
+    UPSET: {
+      multFaible : 1.5,
+      multFort   : 0.6
+    },
+    TIGHT: {
+      multFaible : 1.2,
+      multFort   : 0.8
+    },
+    NEUTRAL: {
+      multFaible : 1.0,
+      multFort   : 1.0
+    }
+  },
 
   // --- SÉRIES ---
   STREAK_MIN: 3,
