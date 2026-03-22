@@ -76,12 +76,13 @@ const Elo = {
    * puis applique les multiplicateurs selon 4 cas évalués dans l'ordre :
    *
    *   CAS 1 — Upset        : joueur_faible gagne
-   *                          → faible ×1.5 | fort ×0.6
+   *                          → faible ×1.5 | fort ×1.5
    *   CAS 2 — Match serré  : joueur_fort gagne ET performance ≥ 2
    *                          → faible ×0.6 | fort ×0.8
-   *   CAS 3 — Dans les clous : -2 ≤ performance < 2
-   *                          → faible ×1.0 | fort ×1.0
-   *   CAS 4 — Écrasement   : performance < -2
+   *   CAS 3 — Crush        : fort gagne ET performance < -2
+   *                            ET eloDiff ≤ ELO_CRUSH_MAX_DIFF
+   *                          → gagnant ×1.3 | perdant ×1.3
+   *   CAS 4 — Neutral      : tout le reste
    *                          → faible ×1.0 | fort ×1.0
    *
    * @param {number}  eloA
@@ -123,8 +124,17 @@ const Elo = {
       multFaible = C.TIGHT.multFaible;
       multFort   = C.TIGHT.multFort;
 
+    } else if (fortWins && performance < -2 && eloDiff <= CONFIG.ELO_CRUSH_MAX_DIFF) {
+      // CAS 3 — Crush : écrasement entre joueurs de niveau similaire
+      // On sort du schéma fort/faible : on récompense le gagnant, on pénalise le perdant
+      const multGagnant = C.CRUSH.multGagnant;
+      const multPerdant = C.CRUSH.multPerdant;
+      const multA = aWins ? multGagnant : multPerdant;
+      const multB = aWins ? multPerdant : multGagnant;
+      return { multA, multB };
+
     } else {
-      // CAS 3 — Dans les clous | CAS 4 — Écrasement → neutre
+      // CAS 4 — Neutral : résultat attendu
       multFaible = C.NEUTRAL.multFaible;
       multFort   = C.NEUTRAL.multFort;
     }

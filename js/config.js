@@ -14,16 +14,21 @@ const CONFIG = {
     { maxElo: Infinity, k: 20 }
   ],
 
+  // Seuil de différence d'ELO en dessous duquel les joueurs sont considérés "égaux"
+  // Au-delà → un écrasement est attendu → NEUTRAL
+  ELO_CRUSH_MAX_DIFF: 100,
+
   // Multiplicateurs de combativité asymétriques
-  // Appliqués selon le rôle ELO (fort / faible) et la performance du joueur_faible
-  // performance = écart_attendu - écart_réel
+  //
+  // performance = expectedGap - avgGap
   //   → performance > 0  : le faible a mieux résisté qu'attendu
   //   → performance <= 0 : le fort a dominé au-delà des attentes
   //
-  // CAS 1 — Upset        : le joueur_faible gagne
-  // CAS 2 — Match serré  : le joueur_fort gagne ET performance ≥ 2
-  // CAS 3 — Dans les clous : -2 ≤ performance < 2   → neutre
-  // CAS 4 — Écrasement   : performance < -2          → neutre
+  // CAS 1 — Upset      : le joueur_faible gagne
+  // CAS 2 — Serré      : le fort gagne ET performance ≥ 2
+  // CAS 3 — Crush      : écrasement + eloDiff ≤ ELO_CRUSH_MAX_DIFF
+  //                       → gagnant récompensé, perdant pénalisé
+  // CAS 4 — Neutral    : tout le reste (attendu selon l'écart ELO)
   ELO_COMBATIVITY: {
     UPSET: {
       multFaible : 1.5,
@@ -33,6 +38,10 @@ const CONFIG = {
       multFaible : 0.6,
       multFort   : 0.8
     },
+    CRUSH: {
+      multGagnant : 1.3,
+      multPerdant : 1.3
+    },
     NEUTRAL: {
       multFaible : 1.0,
       multFort   : 1.0
@@ -40,13 +49,11 @@ const CONFIG = {
   },
 
   // Multiplicateurs de format de match
-  // Un Bo1 rapporte moins car il est joué plus vite (moins d'info sur le niveau réel)
-  // Un Bo5 rapporte plus car il est plus long et plus représentatif
   // Bo3 est la référence neutre (× 1.0)
   ELO_FORMAT_MULTIPLIER: {
     'best1': 0.5,
     'best3': 1.0,
-    'best5': 1.6
+    'best5': 1.67
   },
 
   // --- SÉRIES ---
