@@ -105,9 +105,9 @@ Un match long est plus représentatif du vrai niveau.
 
 | Format | Multiplicateur |
 |--------|---------------|
-| 1 set gagnant (Bo1) | × 0.6 |
+| 1 set gagnant (Bo1) | × 0.4 |
 | Best of 3 ⭐ | × 1.0 |
-| Best of 5 | × 1.3 |
+| Best of 5 | × 1.67 |
 
 ---
 
