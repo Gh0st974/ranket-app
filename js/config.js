@@ -44,9 +44,9 @@ const CONFIG = {
   // Un Bo5 rapporte plus car il est plus long et plus représentatif
   // Bo3 est la référence neutre (× 1.0)
   ELO_FORMAT_MULTIPLIER: {
-    'best1': 0.4,
+    'best1': 0.5,
     'best3': 1.0,
-    'best5': 1.67
+    'best5': 1.6
   },
 
   // --- SÉRIES ---
