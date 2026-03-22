@@ -23,7 +23,9 @@ const Matches = {
     const { setsA, setsB } = this._countSets(sets);
     const aWins     = setsA > setsB;
     const winnerId  = aWins ? playerAId : playerBId;
-    const eloResult = Elo.calculate(playerA.elo, playerB.elo, aWins, sets);
+
+    // ✅ format passé en 5e argument
+    const eloResult = Elo.calculate(playerA.elo, playerB.elo, aWins, sets, format);
 
     const match = {
       id:        this.generateId(),
@@ -103,8 +105,10 @@ const Matches = {
       const pB = cache[m.playerBId];
       if (!pA || !pB) return;
 
-      const aWins     = m.winnerId === m.playerAId;
-      const eloResult = Elo.calculate(pA.elo, pB.elo, aWins, m.sets);
+      const aWins = m.winnerId === m.playerAId;
+
+      // ✅ m.format passé en 5e argument — fallback 'best3' si absent (anciens matchs)
+      const eloResult = Elo.calculate(pA.elo, pB.elo, aWins, m.sets, m.format || 'best3');
 
       // Met à jour les données du match
       m.eloA      = pA.elo;
@@ -115,10 +119,10 @@ const Matches = {
       m.eloBAfter = pB.elo + eloResult.deltaB;
 
       // Met à jour le cache en mémoire (pas de relecture Storage)
-      pA.elo      += eloResult.deltaA;
-      pB.elo      += eloResult.deltaB;
-      pA.matches  += 1;
-      pB.matches  += 1;
+      pA.elo     += eloResult.deltaA;
+      pB.elo     += eloResult.deltaB;
+      pA.matches += 1;
+      pB.matches += 1;
 
       if (aWins) { pA.wins++; pB.losses++; }
       else       { pB.wins++; pA.losses++; }
@@ -135,15 +139,15 @@ const Matches = {
   },
 
   _countSets(sets) {
-  let setsA = 0, setsB = 0;
-  sets.forEach(s => {
-    const a = Number(s.a);
-    const b = Number(s.b);
-    if (a > b) setsA++;
-    else if (b > a) setsB++;
-  });
-  return { setsA, setsB };
-},
+    let setsA = 0, setsB = 0;
+    sets.forEach(s => {
+      const a = Number(s.a);
+      const b = Number(s.b);
+      if (a > b) setsA++;
+      else if (b > a) setsB++;
+    });
+    return { setsA, setsB };
+  },
 
   filter({ playerId = null, order = 'desc' } = {}) {
     let matches = this.getAll();

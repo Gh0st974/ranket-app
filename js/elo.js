@@ -1,19 +1,22 @@
 // 📄 Fichier : /js/elo.js
-// 🎯 Rôle : Calculs mathématiques du système ELO avec K-factor variable
-//           et multiplicateur de combativité asymétrique selon les rôles
-//           fort/faible et la performance réelle vs attendue
+// 🎯 Rôle : Calculs mathématiques du système ELO avec K-factor variable,
+//           multiplicateur de combativité asymétrique selon les rôles
+//           fort/faible, et multiplicateur de format (Bo1 / Bo3 / Bo5)
 
 const Elo = {
 
   /**
-   * Calcule les deltas ELO après un match
-   * @param {number}  eloA  - ELO du joueur A avant le match
-   * @param {number}  eloB  - ELO du joueur B avant le match
-   * @param {boolean} aWins - true si A a gagné
-   * @param {Array}   sets  - [{ a: number, b: number }, ...]
+   * Calcule les deltas ELO après un match.
+   * Les multiplicateurs de combativité et de format sont appliqués ensemble.
+   *
+   * @param {number}  eloA   - ELO du joueur A avant le match
+   * @param {number}  eloB   - ELO du joueur B avant le match
+   * @param {boolean} aWins  - true si A a gagné
+   * @param {Array}   sets   - [{ a: number, b: number }, ...]
+   * @param {string}  format - clé de format : 'best1' | 'best3' | 'best5'
    * @returns {{ deltaA: number, deltaB: number }}
    */
-  calculate(eloA, eloB, aWins, sets = []) {
+  calculate(eloA, eloB, aWins, sets = [], format = 'best3') {
     const expectedA = this._expected(eloA, eloB);
     const expectedB = this._expected(eloB, eloA);
 
@@ -23,11 +26,15 @@ const Elo = {
     const kA = this._kFactor(eloA);
     const kB = this._kFactor(eloB);
 
-    // multA et multB sont directement liés aux joueurs A et B
+    // Multiplicateurs de combativité (asymétriques fort/faible)
     const { multA, multB } = this._combativityMultiplier(eloA, eloB, aWins, sets);
 
-    const deltaA = Math.round(kA * multA * (scoreA - expectedA));
-    const deltaB = Math.round(kB * multB * (scoreB - expectedB));
+    // Multiplicateur de format (Bo1 pénalisé, Bo5 bonifié, Bo3 neutre)
+    const multFormat = this._formatMultiplier(format);
+
+    // Les deux multiplicateurs sont combinés (multipliés ensemble)
+    const deltaA = Math.round(kA * multA * multFormat * (scoreA - expectedA));
+    const deltaB = Math.round(kB * multB * multFormat * (scoreB - expectedB));
 
     return { deltaA, deltaB };
   },
@@ -51,6 +58,17 @@ const Elo = {
   },
 
   /**
+   * Retourne le multiplicateur de format depuis config.js
+   * Fallback à 1.0 si le format est inconnu
+   * @param {string} format - 'best1' | 'best3' | 'best5'
+   * @returns {number}
+   */
+  _formatMultiplier(format) {
+    const mult = CONFIG.ELO_FORMAT_MULTIPLIER[format];
+    return mult !== undefined ? mult : 1.0;
+  },
+
+  /**
    * Calcule les multiplicateurs de combativité asymétriques.
    *
    * Identifie qui est le joueur_fort (ELO le plus haut) et le joueur_faible,
@@ -60,7 +78,7 @@ const Elo = {
    *   CAS 1 — Upset        : joueur_faible gagne
    *                          → faible ×1.5 | fort ×0.6
    *   CAS 2 — Match serré  : joueur_fort gagne ET performance ≥ 2
-   *                          → faible ×1.2 | fort ×0.8
+   *                          → faible ×0.6 | fort ×0.8
    *   CAS 3 — Dans les clous : -2 ≤ performance < 2
    *                          → faible ×1.0 | fort ×1.0
    *   CAS 4 — Écrasement   : performance < -2
@@ -79,9 +97,9 @@ const Elo = {
     // --- Identification des rôles ---
     // aIsFort = true si A est le joueur avec le plus haut ELO
     // En cas d'égalité d'ELO, A est arbitrairement considéré comme le fort
-    const aIsFort   = eloA >= eloB;
-    const fortWins  = aIsFort ? aWins : !aWins;  // true si le joueur_fort a gagné
-    const faibleWins = !fortWins;                 // true si le joueur_faible a gagné
+    const aIsFort    = eloA >= eloB;
+    const fortWins   = aIsFort ? aWins : !aWins;
+    const faibleWins = !fortWins;
 
     // --- Calcul de la performance du joueur_faible ---
     // performance > 0 : le faible a mieux résisté qu'attendu
@@ -106,9 +124,7 @@ const Elo = {
       multFort   = C.TIGHT.multFort;
 
     } else {
-      // CAS 3 — Dans les clous (-2 ≤ performance < 2)
-      // CAS 4 — Écrasement (performance < -2)
-      // Les deux cas sont neutres
+      // CAS 3 — Dans les clous | CAS 4 — Écrasement → neutre
       multFaible = C.NEUTRAL.multFaible;
       multFort   = C.NEUTRAL.multFort;
     }
@@ -122,15 +138,13 @@ const Elo = {
 
   /**
    * Retourne l'écart de points attendu par set selon la différence d'ELO.
-   * Plus la différence est grande, plus l'écart attendu est élevé.
    *
-   * Table :
    *   0   - 50  → 2 pts
    *   51  - 150 → 4 pts
    *   151 - 300 → 6 pts
    *   301+      → 8 pts
    *
-   * @param {number} eloDiff - différence absolue entre les deux ELO
+   * @param {number} eloDiff
    * @returns {number}
    */
   _expectedGap(eloDiff) {
@@ -142,7 +156,7 @@ const Elo = {
 
   /**
    * Calcule l'écart moyen de points par set.
-   * Ex: sets = [{a:11, b:9}, {a:8, b:11}] → écarts = [2, 3] → moyenne = 2.5
+   * Ex: [{a:11, b:9}, {a:8, b:11}] → écarts = [2, 3] → moyenne = 2.5
    *
    * @param {Array} sets - [{ a: number, b: number }, ...]
    * @returns {number}

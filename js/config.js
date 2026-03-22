@@ -39,6 +39,16 @@ const CONFIG = {
     }
   },
 
+  // Multiplicateurs de format de match
+  // Un Bo1 rapporte moins car il est joué plus vite (moins d'info sur le niveau réel)
+  // Un Bo5 rapporte plus car il est plus long et plus représentatif
+  // Bo3 est la référence neutre (× 1.0)
+  ELO_FORMAT_MULTIPLIER: {
+    'best1': 0.6,
+    'best3': 1.0,
+    'best5': 1.3
+  },
+
   // --- SÉRIES ---
   STREAK_MIN: 3,
 
