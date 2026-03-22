@@ -27,7 +27,7 @@ const CONFIG = {
   ELO_COMBATIVITY: {
     UPSET: {
       multFaible : 1.5,
-      multFort   : 0.6
+      multFort   : 1,5
     },
     TIGHT: {
       multFaible : 0.6,
