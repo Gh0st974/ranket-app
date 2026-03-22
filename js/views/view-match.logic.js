@@ -22,16 +22,16 @@ const ViewMatchLogic = {
 
     const eloA  = pA.elo ?? CONFIG.DEFAULT_ELO;
     const eloB  = pB.elo ?? CONFIG.DEFAULT_ELO;
-    const probaA = Math.round(EloEngine.winProbability(eloA, eloB) * 100);
+    const probaA = Elo.winProbability(eloA, eloB);
     const probaB = 100 - probaA;
 
     const nameA = Players.fullName(pA);
     const nameB = Players.fullName(pB);
 
     document.getElementById('proba-display').innerHTML =
-      `<span class="proba-highlight" style="color:var(--color-primary)">${nameA} : ${probaA}%</span>
+      `<span class="proba-highlight" style="color:var(--color-primary)">${probaA}%</span>
        &nbsp;probabilité de victoire&nbsp;
-       <span class="proba-highlight" style="color:var(--color-primary)">${nameB} : ${probaB}%</span>`;
+       <span class="proba-highlight" style="color:var(--color-primary)">${probaB}%</span>`;
   },
 
   /** Met à jour le score final affiché */
