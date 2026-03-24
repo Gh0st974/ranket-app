@@ -154,7 +154,7 @@
 }
 
 /* ===== LISTE JOUEURS (vue joueurs) ===== */
-.player-list-item {
+.player-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -165,16 +165,21 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.07);
 }
 
-.player-list-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.player-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #222;
+  flex: 1;
 }
 
-.player-list-name  { font-weight: 700; font-size: 0.9rem; }
-.player-list-stats { font-size: 0.72rem; color: #888; }
+.player-elo {
+  font-size: 0.82rem;
+  color: #888;
+  margin-right: 10px;
+}
 
-.player-list-actions {
+.player-actions {
   display: flex;
   gap: 6px;
 }
+
