@@ -8,7 +8,7 @@ const ViewSettings = {
 
   /** Rendu principal de la vue */
   render() {
-    document.getElementById('app-main').innerHTML = ViewSettingsHTML.main();
+    document.getElementById('tab-settings').innerHTML = ViewSettingsHTML.main();
     this._bindEvents();
   },
 
