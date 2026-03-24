@@ -10,23 +10,27 @@ const ImportExport = {
    * Génère et télécharge un fichier JSON contenant joueurs + matchs
    */
   exportJSON() {
-    const data = {
-      version: '1.0',
-      exportedAt: new Date().toISOString(),
-      players: Storage.get('players') || [],
-      matches: Storage.get('matches') || []
-    };
+  const data = {
+    version: '1.0',
+    exportedAt: new Date().toISOString(),
+    players: Storage.get('players') || [],
+    matches: Storage.get('matches') || []
+  };
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
 
-    a.href     = url;
-    a.download = `ranket-backup-${this._dateStamp()}.json`;
-    a.click();
+  a.href     = url;
+  a.download = `ranket-backup-${this._dateStamp()}.json`;
 
-    URL.revokeObjectURL(url);
-  },
+  // ✅ Fix : l'élément doit être dans le DOM pour fonctionner sur mobile/PWA
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+},
 
   // ===== IMPORT =====
 
