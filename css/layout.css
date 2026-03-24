@@ -101,3 +101,11 @@ body {
   padding: 16px;
   background-color: #f4f4f4;
 }
+
+/* --- Onglet Settings (section fixe hors #app-main) --- */
+#tab-settings {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background-color: #f4f4f4;
+}
