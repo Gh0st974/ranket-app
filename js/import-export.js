@@ -10,27 +10,27 @@ const ImportExport = {
    * Génère et télécharge un fichier JSON contenant joueurs + matchs
    */
   exportJSON() {
-  const data = {
-    version: '1.0',
-    exportedAt: new Date().toISOString(),
-    players: Storage.get('players') || [],
-    matches: Storage.get('matches') || []
-  };
+    const data = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      players: Storage.getPlayers(),
+      matches: Storage.getMatches()
+    };
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
 
-  a.href     = url;
-  a.download = `ranket-backup-${this._dateStamp()}.json`;
+    a.href     = url;
+    a.download = `ranket-backup-${this._dateStamp()}.json`;
 
-  // ✅ Fix : l'élément doit être dans le DOM pour fonctionner sur mobile/PWA
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+    // ✅ Fix : l'élément doit être dans le DOM pour fonctionner sur mobile/PWA
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
-  URL.revokeObjectURL(url);
-},
+    URL.revokeObjectURL(url);
+  },
 
   // ===== IMPORT =====
 
@@ -84,14 +84,14 @@ const ImportExport = {
 
   /**
    * Fusionne joueurs et matchs importés avec les données existantes
-   * - Joueurs : skip si ID existant, création auto si inconnu
+   * - Joueurs : skip si ID existant
    * - Matchs  : skip si ID existant (import additif)
    * @param {object} data - Données parsées du JSON
    * @returns {{ newPlayers: number, newMatches: number }}
    */
   _merge(data) {
-    const existingPlayers = Storage.get('players') || [];
-    const existingMatches = Storage.get('matches') || [];
+    const existingPlayers = Storage.getPlayers();
+    const existingMatches = Storage.getMatches();
 
     const existingPlayerIds = new Set(existingPlayers.map(p => p.id));
     const existingMatchIds  = new Set(existingMatches.map(m => m.id));
@@ -115,8 +115,8 @@ const ImportExport = {
     }
 
     // Sauvegarde
-    Storage.set('players', existingPlayers);
-    Storage.set('matches', existingMatches);
+    Storage.savePlayers(existingPlayers);
+    Storage.saveMatches(existingMatches);
 
     // Recalcul ELO complet
     Matches._recalcAllElo();
