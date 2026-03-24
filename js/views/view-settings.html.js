@@ -39,6 +39,20 @@ const ViewSettingsHTML = {
           <p class="settings-file-hint" id="import-file-name">Aucun fichier sélectionné</p>
         </div>
 
+        <!-- SECTION ZONE DANGEREUSE -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">⚠️ Zone dangereuse</h3>
+          <p class="settings-section-desc">
+            Ces actions sont irréversibles. Utilise-les avec précaution.
+          </p>
+          <div class="danger-zone">
+            <div class="danger-zone-buttons">
+              <button class="btn btn-warning" id="btn-reset-elo">🔄 Remettre les ELO à zéro</button>
+              <button class="btn btn-danger"  id="btn-clear-all">🗑 Tout supprimer</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
   },

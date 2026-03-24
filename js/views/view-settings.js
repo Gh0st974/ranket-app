@@ -16,6 +16,7 @@ const ViewSettings = {
   _bindEvents() {
     this._bindExport();
     this._bindImport();
+    this._bindDangerZone();
   },
 
   // ===== EXPORT =====
@@ -68,6 +69,43 @@ const ViewSettings = {
         UI.toast(`❌ Erreur : ${errorMsg}`);
       }
     );
+  },
+
+  // ===== ZONE DANGEREUSE =====
+
+  /** Attache les événements de la zone dangereuse */
+  _bindDangerZone() {
+    // Remettre les ELO à zéro
+    document.getElementById('btn-reset-elo')
+      .addEventListener('click', () => {
+        UI.confirm(
+          '🔄 Remettre les ELO à zéro ?',
+          'Tous les ELO seront réinitialisés à leur valeur par défaut. Cette action est irréversible.',
+          () => {
+            Storage.resetElo();
+            UI.toast('✅ ELO remis à zéro.');
+            App.navigate('ranking');
+          },
+          'Remettre à zéro',
+          'btn-warning'
+        );
+      });
+
+    // Tout supprimer
+    document.getElementById('btn-clear-all')
+      .addEventListener('click', () => {
+        UI.confirm(
+          '🗑 Tout supprimer ?',
+          'Tous les joueurs et matchs seront définitivement supprimés. Cette action est irréversible.',
+          () => {
+            Storage.clearAll();
+            UI.toast('✅ Toutes les données supprimées.');
+            App.navigate('ranking');
+          },
+          'Tout supprimer',
+          'btn-danger'
+        );
+      });
   }
 
 };

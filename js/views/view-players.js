@@ -44,16 +44,6 @@ const ViewPlayers = {
       <div id="players-list-container">
         ${this._buildList()}
       </div>
-
-      <!-- Zone danger -->
-      <div class="danger-zone">
-        <div class="danger-zone-title">⚠️ Zone dangereuse</div>
-        <div class="danger-zone-subtitle">Ces actions sont irréversibles</div>
-        <div class="danger-zone-buttons">
-          <button class="btn btn-warning" id="btn-reset-elo">🔄 Remettre les ELO à zéro</button>
-          <button class="btn btn-danger"  id="btn-clear-all">🗑 Tout supprimer</button>
-        </div>
-      </div>
     `;
   },
 
@@ -67,100 +57,72 @@ const ViewPlayers = {
     const visible = players.slice(0, this._displayCount);
     const hasMore = players.length > this._displayCount;
 
-    const items = visible.map(p => `
-      <div class="player-list-item" data-id="${p.id}">
-        <div class="player-list-info">
-          <span class="player-list-name">${Players.fullName(p)}</span>
-          <span class="player-list-stats">
-            ELO : ${p.elo} — ${p.matches} match(s) — ${p.wins}V / ${p.losses}D
-          </span>
-        </div>
-        <div class="player-list-actions">
-          <button class="icon-btn icon-btn-edit"   data-edit="${p.id}">✏️</button>
-          <button class="icon-btn icon-btn-delete" data-delete="${p.id}">🗑</button>
+    const rows = visible.map(p => `
+      <div class="player-row" data-id="${p.id}">
+        <span class="player-name">${Players.fullName(p)}</span>
+        <span class="player-elo">${p.elo} pts</span>
+        <div class="player-actions">
+          <button class="btn btn-sm btn-secondary btn-edit-player" data-id="${p.id}">✏️</button>
+          <button class="btn btn-sm btn-danger btn-delete-player" data-id="${p.id}">🗑</button>
         </div>
       </div>
     `).join('');
 
-    const showMore = hasMore ? `
-      <div class="show-more-btn">
-        <button id="btn-show-more-players">⌄ Afficher plus</button>
-      </div>` : '';
+    const moreBtn = hasMore ? `
+      <button class="btn btn-secondary btn-load-more" id="btn-load-more-players">
+        Voir plus (${players.length - this._displayCount} restants)
+      </button>
+    ` : '';
 
-    return items + showMore;
+    return rows + moreBtn;
   },
 
-  /** Attache les événements */
+  /** Attache tous les événements */
   _bindEvents() {
     // Ajout joueur
-    document.getElementById('btn-add-player').addEventListener('click', () => {
-      this._addPlayer();
-    });
-
-    // Entrée clavier sur les champs
-    ['input-firstname', 'input-lastname'].forEach(id => {
-      document.getElementById(id)?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') this._addPlayer();
-      });
-    });
-
-    // Affichage nom fichier CSV
-    document.getElementById('csv-file-input')?.addEventListener('change', (e) => {
-      const name = e.target.files[0]?.name || 'Aucun fichier';
-      document.getElementById('csv-file-name').textContent = name;
-    });
+    document.getElementById('btn-add-player')
+      .addEventListener('click', () => this._addPlayer());
 
     // Import CSV
-    document.getElementById('btn-import-csv')?.addEventListener('click', () => {
-      this._importCSV();
-    });
+    document.getElementById('btn-import-csv')
+      .addEventListener('click', () => this._importCSV());
 
-    // Délégation sur la liste
-    document.getElementById('players-list-container')?.addEventListener('click', (e) => {
-      const editId   = e.target.closest('[data-edit]')?.dataset.edit;
-      const deleteId = e.target.closest('[data-delete]')?.dataset.delete;
+    // Nom fichier CSV
+    document.getElementById('csv-file-input')
+      .addEventListener('change', (e) => {
+        const name = e.target.files[0]?.name || 'Aucun fichier';
+        document.getElementById('csv-file-name').textContent = name;
+      });
 
-      if (editId)   this._editPlayer(editId);
-      if (deleteId) this._deletePlayer(deleteId);
+    // Liste : édition / suppression / voir plus
+    document.getElementById('players-list-container')
+      .addEventListener('click', (e) => {
+        const editBtn   = e.target.closest('.btn-edit-player');
+        const deleteBtn = e.target.closest('.btn-delete-player');
+        const moreBtn   = e.target.closest('#btn-load-more-players');
 
-      if (e.target.id === 'btn-show-more-players') {
-        this._displayCount += CONFIG.ITEMS_PER_PAGE;
-        this._refreshList();
-      }
-    });
-
-    // Reset ELO
-    document.getElementById('btn-reset-elo')?.addEventListener('click', () => {
-      UI.confirm(
-        'Remettre tous les ELO à zéro ?',
-        `Les ELO seront remis à ${CONFIG.ELO_DEFAULT}. L'historique des matchs sera supprimé.`,
-        () => { Storage.resetElo(); UI.toast('ELO réinitialisés ✅'); this.render(); },
-        'Réinitialiser', 'btn-warning'
-      );
-    });
-
-    // Tout supprimer
-    document.getElementById('btn-clear-all')?.addEventListener('click', () => {
-      UI.confirm(
-        'Tout supprimer ?',
-        'Tous les joueurs et matchs seront définitivement supprimés.',
-        () => { Storage.clearAll(); UI.toast('Données supprimées ✅'); this.render(); },
-        'Tout supprimer', 'btn-danger'
-      );
-    });
+        if (editBtn)   this._editPlayer(editBtn.dataset.id);
+        if (deleteBtn) this._deletePlayer(deleteBtn.dataset.id);
+        if (moreBtn)   this._loadMore();
+      });
   },
 
-  /** Ajoute un joueur depuis le formulaire */
+  /** Charge plus de joueurs */
+  _loadMore() {
+    this._displayCount += CONFIG.ITEMS_PER_PAGE;
+    this._refreshList();
+  },
+
+  /** Ajoute un joueur */
   _addPlayer() {
-    const firstName = document.getElementById('input-firstname').value.trim();
-    const lastName  = document.getElementById('input-lastname').value.trim();
-    if (!firstName || !lastName) {
-      UI.toast('⚠️ Prénom et nom requis.'); return;
-    }
-    Players.add(firstName, lastName);
+    const fn = document.getElementById('input-firstname').value.trim();
+    const ln = document.getElementById('input-lastname').value.trim();
+    if (!fn || !ln) { UI.toast('⚠️ Prénom et nom requis.'); return; }
+
+    Players.add(fn, ln);
+    UI.toast(`✅ ${fn} ${ln.toUpperCase()} ajouté !`);
     document.getElementById('input-firstname').value = '';
     document.getElementById('input-lastname').value  = '';
-    UI.toast(`✅ ${firstName} ${lastName.toUpperCase()} ajouté !`);
     this._refreshList();
   },
 
